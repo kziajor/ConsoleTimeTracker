@@ -1,33 +1,19 @@
-﻿using Terminal.Gui;
+﻿using App.Migrations;
+using System.CommandLine;
 
-Application.Init();
-var window = new Window("TimeSheet - Ctrl-Q to quit")
+namespace App;
+
+static class Program
 {
-   X = 0,
-   Y = 0,
-   Width = Dim.Fill(),
-   Height = Dim.Fill(),
-};
-
-Application.Top.Add(window);
-
-var messageButton = new Button(1, 1, "Message");
-var closeButton = new Button(12, 1, "Close", true);
-
-messageButton.Clicked += () =>
-{
-   var n = MessageBox.Query(50, 7,
-            "Question", "Do you want to exit?", "Yes", "No");
-
-   if (n == 0)
+   static async Task<int> Main(string[] args)
    {
-      Environment.Exit(0);
+      const string defaultDbPath = "./Data.db";
+      // TODO: Save and read settings from User directory
+      // TODO: Get path for database from settings or default - user can set this path
+      DbMigrator.Migrate($"Data Source={defaultDbPath}");
+
+      var rootCommand = new RootCommand("Console Time Tracker (TT)");
+
+      return await rootCommand.InvokeAsync(args);
    }
-};
-
-closeButton.Clicked += () => Environment.Exit(0);
-
-window.Add(messageButton);
-window.Add(closeButton);
-
-Application.Run();
+}
