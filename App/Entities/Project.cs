@@ -2,7 +2,7 @@
 
 public class Project
 {
-   public int Id { get; set; }
-   public int AzureDevOpsId { get; set; }
+   public int? Id { get; set; }
    public string Name { get; set; } = string.Empty;
+   public bool Closed { get; set; } = false;
 }
