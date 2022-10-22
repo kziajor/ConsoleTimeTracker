@@ -8,11 +8,15 @@ static class Program
 {
    static async Task<int> Main(string[] args)
    {
-      ShowTitle();
-      const string defaultDbPath = "./Data.db";
-      // TODO: Save and read settings from User directory
-      // TODO: Get path for database from settings or default - user can set this path
-      DbMigrator.Migrate($"Data Source={defaultDbPath}");
+      AnsiConsole.Write(new FigletText("ConsoleTT").Color(Color.Green));
+
+      var settingsProvider = new SettingsProvider();
+
+      EnsureDbDataDirectoryExists(settingsProvider.DbFile);
+
+      DbMigrator.Migrate(settingsProvider.ConnectionString);
+
+      ShowBasicInfo(settingsProvider);
 
       var rootCommand = new RootCommand("Console Time Tracker")
       {
@@ -22,8 +26,21 @@ static class Program
       return await rootCommand.InvokeAsync(args);
    }
 
-   private static void ShowTitle()
+   private static void EnsureDbDataDirectoryExists(FileInfo dbDataFile)
    {
-      AnsiConsole.Write(new FigletText("TT").Color(Color.Green));
+      if (dbDataFile.Directory is null)
+      {
+         throw new ArgumentException($"Data directory error for path: {dbDataFile.FullName}");
+      }
+
+      if (!dbDataFile.Directory.Exists)
+      {
+         Directory.CreateDirectory(dbDataFile.Directory.FullName);
+      }
+   }
+
+   private static void ShowBasicInfo(SettingsProvider settingsProvider)
+   {
+      AnsiConsole.MarkupLine($"Database file: [green]{settingsProvider.DbFile.FullName}[/]");
    }
 }
