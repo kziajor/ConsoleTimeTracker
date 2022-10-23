@@ -21,8 +21,8 @@ public class SettingsProvider : ISettingsProvider
    public string CurrentUserDocumentsDirectory { get; }
    public FileInfo SettingsFile { get; }
 
-   public FileInfo DbFile { get; private set; }
-   public string ConnectionString { get; private set; }
+   public FileInfo DbFile { get; }
+   public string ConnectionString { get; }
 
    public SettingsProvider()
    {
@@ -30,8 +30,14 @@ public class SettingsProvider : ISettingsProvider
       CurrentUserDocumentsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
       SettingsFile = new FileInfo(Path.Join(CurrentUserApplicationDataPath, "./ConsoleTT/settings.json"));
       _defaultDbFile = new FileInfo(Path.Join(CurrentUserDocumentsDirectory, "./ConsoleTT/Data.db"));
-      SettingsDto? settingsDto;
+      SettingsDto? settingsDto = SettingsFileReadOrCreate();
+      DbFile = settingsDto?.DbFilePath is not null ? new FileInfo(settingsDto.DbFilePath) : _defaultDbFile;
+      ConnectionString = $"Data Source={DbFile}";
+   }
 
+   private SettingsDto SettingsFileReadOrCreate()
+   {
+      SettingsDto? settingsDto;
       if (!SettingsFile.Exists)
       {
          if (SettingsFile.Directory is null)
@@ -62,12 +68,6 @@ public class SettingsProvider : ISettingsProvider
          }
       }
 
-      FillFrom(settingsDto);
-   }
-
-   private void FillFrom(SettingsDto? settingsDto)
-   {
-      DbFile = settingsDto?.DbFilePath is not null ? new FileInfo(settingsDto.DbFilePath) : _defaultDbFile;
-      ConnectionString = $"Data Source={DbFile}";
+      return settingsDto;
    }
 }
