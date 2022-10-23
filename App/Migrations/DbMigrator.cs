@@ -10,7 +10,7 @@ public static class DbMigrator
       var migratorBuilder = DeployChanges.To
          .SQLiteDatabase(connectionString)
          .WithTransaction()
-         .WithScripts(GetScripts());
+         .WithScripts(GetScripts().ToArray());
 
 #if DEBUG
       migratorBuilder.LogToConsole();
@@ -25,20 +25,15 @@ public static class DbMigrator
       engine.PerformUpgrade();
    }
 
-   private static IEnumerable<SqlScript> GetScripts()
+   private static IEnumerable<IScript> GetScripts()
    {
-      var scriptsNamespace = $"{typeof(DbMigrator).Namespace}.{nameof(MigrationScripts)}";
-      var result = AppDomain.CurrentDomain
+      return AppDomain.CurrentDomain
          .GetAssemblies()
          .SelectMany(a => a.GetTypes())
-         .Where(t => typeof(ISqlScript).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Namespace == scriptsNamespace)
-         .Select(t =>
-         {
-            var scriptContent = ((ISqlScript?)Activator.CreateInstance(t)!).Script;
-            return new SqlScript(t.FullName, scriptContent);
-         })
-         .OrderBy(script => script.Name);
-
-      return result;
+         .Where(t => typeof(IScript).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name.StartsWith("Script_"))
+         .Select(t => Activator.CreateInstance(t))
+         .Where(o => o is not null)
+         .Select(o => (IScript)o!)
+         .OrderBy(s => nameof(s));
    }
 }

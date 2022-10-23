@@ -1,8 +1,11 @@
-﻿namespace App.Migrations.MigrationScripts;
+﻿using DbUp.Engine;
+using System.Data;
 
-public class Script002_CreateTasksTable : ISqlScript
+namespace App.Migrations.MigrationScripts;
+
+public class Script_002_CreateTasksTable : IScript
 {
-   public string Script =>
+   public string ProvideScript(Func<IDbCommand> dbCommandFactory) =>
 @"
 CREATE TABLE IF NOT EXISTS tasks (
    id INTEGER PRIMARY KEY AUTOINCREMENT,
