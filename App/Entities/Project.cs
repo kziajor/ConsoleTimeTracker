@@ -1,8 +1,12 @@
-﻿namespace Cli.Entities;
+﻿using Dapper.Contrib.Extensions;
 
+namespace App.Entities;
+
+[Table("projects")]
 public class Project
 {
-   public int? Id { get; set; }
+   [Key]
+   public int Id { get; set; }
    public string Name { get; set; } = string.Empty;
-   public bool Closed { get; set; } = false;
+   public bool Closed { get; set; }
 }

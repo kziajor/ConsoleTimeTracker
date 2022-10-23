@@ -1,4 +1,6 @@
+﻿using App.Commands.Projects;
 using App.Migrations;
+using App.Repositories;
 using Spectre.Console;
 using System.CommandLine;
 
@@ -25,6 +27,10 @@ static class Program
       {
          Name = "TT",
       };
+
+      var dbRepository = (IDbRepository)new DbRepository(settingsProvider.ConnectionString);
+
+      rootCommand.Add(new ProjectCommand(dbRepository));
 
       return await rootCommand.InvokeAsync(args);
    }

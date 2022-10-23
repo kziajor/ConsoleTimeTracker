@@ -1,20 +1,20 @@
-﻿using Microsoft.Data.Sqlite;
+﻿namespace App.Repositories;
 
-namespace App.Repositories;
-
-public class DbRepository
+public interface IDbRepository
 {
-   protected readonly string _connectionString;
+   IProjectsRepository Projects { get; }
+}
 
-   public DbRepository(string connectionString)
-   {
-      _connectionString = connectionString;
-   }
+public class DbRepository : IDbRepository
+{
+   private readonly string _connectionsString;
 
-   protected T Query<T>(Func<SqliteConnection, T> query)
+   private ProjectsRepository? projects;
+
+   public IProjectsRepository Projects => projects ??= new ProjectsRepository(_connectionsString);
+
+   public DbRepository(string connectionsString)
    {
-      using var connection = new SqliteConnection(_connectionString);
-      connection.Open();
-      return query.Invoke(connection);
+      _connectionsString = connectionsString;
    }
 }
