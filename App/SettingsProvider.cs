@@ -23,6 +23,7 @@ public class SettingsProvider : ISettingsProvider
 
    public FileInfo DbFile { get; }
    public string ConnectionString { get; }
+   public bool DisplayTitle { get; }
 
    public SettingsProvider()
    {
@@ -33,6 +34,7 @@ public class SettingsProvider : ISettingsProvider
       SettingsDto? settingsDto = SettingsFileReadOrCreate();
       DbFile = settingsDto?.DbFilePath is not null ? new FileInfo(settingsDto.DbFilePath) : _defaultDbFile;
       ConnectionString = $"Data Source={DbFile}";
+      DisplayTitle = string.IsNullOrEmpty(settingsDto?.DisplayTitle) || settingsDto?.DisplayTitle.ToLower() == "on";
    }
 
    private SettingsDto SettingsFileReadOrCreate()

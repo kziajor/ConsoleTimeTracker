@@ -1,4 +1,4 @@
-﻿using App.Migrations;
+using App.Migrations;
 using Spectre.Console;
 using System.CommandLine;
 
@@ -8,9 +8,12 @@ static class Program
 {
    static async Task<int> Main(string[] args)
    {
-      AnsiConsole.Write(new FigletText("ConsoleTT").Color(Color.Green));
-
       var settingsProvider = new SettingsProvider();
+
+      if (settingsProvider.DisplayTitle)
+      {
+         AnsiConsole.Write(new FigletText("ConsoleTT").Color(Color.Green));
+      }
 
       EnsureDbDataDirectoryExists(settingsProvider.DbFile);
 
