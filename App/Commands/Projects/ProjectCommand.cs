@@ -1,4 +1,5 @@
 ﻿using App.Repositories;
+
 using System.CommandLine;
 
 namespace App.Commands.Projects
@@ -15,14 +16,25 @@ namespace App.Commands.Projects
          Add(new AddProjectCommand(_dbRepository));
          Add(new EditProjectCommand(_dbRepository));
 
-         this.SetHandler(() => ProjectsListHandle());
+         var closedOption = new Option<bool>(
+               name: "--closed",
+               getDefaultValue: () => false,
+               description: "Get closed projects"
+            );
+         closedOption.AddAlias("-c");
+
+         Add(closedOption);
+
+         this.SetHandler((closed) => ProjectsListHandle(closed), closedOption);
       }
 
-      private void ProjectsListHandle()
+      private void ProjectsListHandle(bool closed)
       {
-         var projects = _dbRepository.Projects.GetAll();
+         var projects = closed
+            ? _dbRepository.Projects.GetClosed()
+            : _dbRepository.Projects.GetActive();
 
-         ProjectCommon.DisplayProjectsList(projects);
+         ProjectCommon.DisplayProjectsList(projects, closed ? "Closed projects" : "Active projects");
       }
    }
 }

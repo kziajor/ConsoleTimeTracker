@@ -1,7 +1,9 @@
 ﻿using App.Commands.Projects;
 using App.Migrations;
 using App.Repositories;
+
 using Spectre.Console;
+
 using System.CommandLine;
 
 namespace App;
@@ -51,5 +53,7 @@ static class Program
    private static void ShowBasicInfo(SettingsProvider settingsProvider)
    {
       AnsiConsole.MarkupLine($"Database file: [green]{settingsProvider.DbFile.FullName}[/]");
+      AnsiConsole.WriteLine();
+      AnsiConsole.WriteLine();
    }
 }

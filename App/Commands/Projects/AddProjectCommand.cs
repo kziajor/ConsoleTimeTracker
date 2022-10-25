@@ -1,7 +1,9 @@
 ﻿using App.Entities;
 using App.Extensions;
 using App.Repositories;
+
 using Spectre.Console;
+
 using System.CommandLine;
 
 namespace App.Commands.Projects
@@ -39,9 +41,9 @@ namespace App.Commands.Projects
 
          AnsiConsole.MarkupLine("[green]New project added[/]");
 
-         var projects = _dbRepository.Projects.GetAll();
+         var projects = _dbRepository.Projects.GetActive();
 
-         ProjectCommon.DisplayProjectsList(projects);
+         ProjectCommon.DisplayProjectsList(projects, "Active projects");
       }
    }
 }

@@ -1,12 +1,13 @@
 ﻿using App.Entities;
 using App.Extensions;
+
 using Spectre.Console;
 
 namespace App.Commands.Projects
 {
    public static class ProjectCommon
    {
-      public static void DisplayProjectsList(IEnumerable<Project> projects)
+      public static void DisplayProjectsList(IEnumerable<Project> projects, string header = "Projects")
       {
          var table = new Table();
 
@@ -21,7 +22,7 @@ namespace App.Commands.Projects
             table.AddRow(project.Id.ToString(), project.Name, project.Closed ? "" : "[green]X[/]");
          }
 
-         AnsiConsole.MarkupLine("[green]Projects[/]");
+         AnsiConsole.MarkupLineInterpolated($"[green]{header}[/]");
          AnsiConsole.Write(table);
       }
 

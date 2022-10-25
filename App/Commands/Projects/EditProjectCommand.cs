@@ -1,7 +1,9 @@
 ﻿using App.Entities;
 using App.Extensions;
 using App.Repositories;
+
 using Spectre.Console;
+
 using System.CommandLine;
 
 namespace App.Commands.Projects;
@@ -41,23 +43,24 @@ public class EditProjectCommand : Command
 
    private void EditProjectHandler(int projectId, string name, bool? active)
    {
-      var projects = _dbRepository.Projects.GetAll();
-
-      if (!projects.Any())
-      {
-         AnsiConsole.MarkupLine("[red]Projects not found. You have to add one first.[/]");
-         return;
-      }
-
+      IEnumerable<Project>? projects = null;
       Project? project;
 
       if (projectId <= 0)
       {
+         projects = _dbRepository.Projects.GetAll();
+
+         if (!projects.Any())
+         {
+            AnsiConsole.MarkupLine("[red]Projects not found. You have to add one first.[/]");
+            return;
+         }
+
          project = ProjectCommon.AskForProjectId(projects);
       }
       else
       {
-         project = projects.FirstOrDefault(p => p.Id == projectId);
+         project = _dbRepository.Projects.Get(projectId);
 
          if (project == null)
          {
@@ -67,8 +70,8 @@ public class EditProjectCommand : Command
       }
 
       if (name.IsNullOrEmpty()) { name = ProjectCommon.AskForProjectName(true, "Project name (leave empty if not changed):"); }
-      if (active is null) { active = ProjectCommon.AskIsProjectActive(); }
 
+      active ??= ProjectCommon.AskIsProjectActive();
       project.Name = name.IsNullOrEmpty() ? project.Name : name;
       project.Closed = !active.Value;
 
@@ -81,7 +84,8 @@ public class EditProjectCommand : Command
       else
       {
          AnsiConsole.MarkupLine("[green]Project updated successfully[/]");
-         ProjectCommon.DisplayProjectsList(projects);
+         projects ??= _dbRepository.Projects.GetActive();
+         ProjectCommon.DisplayProjectsList(projects.Where(p => !p.Closed), "Active projects");
       }
    }
 }

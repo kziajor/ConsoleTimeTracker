@@ -1,4 +1,7 @@
 ﻿using App.Entities;
+using App.Repositories.Queries;
+
+using Dapper;
 using Dapper.Contrib.Extensions;
 
 namespace App.Repositories;
@@ -7,6 +10,8 @@ public interface IProjectsRepository
 {
    Project Get(int id);
    IEnumerable<Project> GetAll();
+   IEnumerable<Project> GetClosed();
+   IEnumerable<Project> GetActive();
    Project? Add(Project project);
    bool Update(Project project);
 }
@@ -25,6 +30,16 @@ public class ProjectsRepository : BaseRepository, IProjectsRepository
    public IEnumerable<Project> GetAll()
    {
       return Query((connection) => connection.GetAll<Project>());
+   }
+
+   public IEnumerable<Project> GetClosed()
+   {
+      return Query((connection) => connection.Query<Project>(ProjectQueries.ClosedProjectsQuery));
+   }
+
+   public IEnumerable<Project> GetActive()
+   {
+      return Query((connection) => connection.Query<Project>(ProjectQueries.ActiveProjectsQuery));
    }
 
    public Project? Add(Project project)
