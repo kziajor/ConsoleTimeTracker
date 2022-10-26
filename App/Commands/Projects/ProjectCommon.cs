@@ -61,5 +61,12 @@ namespace App.Commands.Projects
                   })
             );
       }
+
+      public static void ShowProjectDetails(Project? project)
+      {
+         AnsiConsole.Console.WriteKeyValuePair("Id", project.Id.ToString());
+         AnsiConsole.Console.WriteKeyValuePair("Name", project.Name);
+         AnsiConsole.Console.WriteKeyValuePair("Active", project.Closed ? "No" : "Yes");
+      }
    }
 }

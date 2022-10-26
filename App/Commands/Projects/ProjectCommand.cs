@@ -15,6 +15,7 @@ namespace App.Commands.Projects
 
          Add(new AddProjectCommand(_dbRepository));
          Add(new EditProjectCommand(_dbRepository));
+         Add(new ShowProjectCommand(dbRepository));
 
          var closedOption = new Option<bool>(
                name: "--closed",
