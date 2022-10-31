@@ -1,4 +1,5 @@
-﻿using App.Commands.Projects;
+using App.Commands.Projects;
+using App.Commands.Tasks;
 using App.Migrations;
 using App.Repositories;
 
@@ -16,7 +17,7 @@ static class Program
 
       if (settingsProvider.DisplayTitle)
       {
-         AnsiConsole.Write(new FigletText("ConsoleTT").Color(Color.Green));
+         DisplayTitle();
       }
 
       EnsureDbDataDirectoryExists(settingsProvider.DbFile);
@@ -35,6 +36,11 @@ static class Program
       rootCommand.Add(new ProjectCommand(dbRepository));
 
       return await rootCommand.InvokeAsync(args);
+   }
+
+   private static void DisplayTitle()
+   {
+      AnsiConsole.Write(new FigletText("ConsoleTT").Color(Color.Green));
    }
 
    private static void EnsureDbDataDirectoryExists(FileInfo dbDataFile)
