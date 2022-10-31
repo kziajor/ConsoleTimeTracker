@@ -1,4 +1,4 @@
-using App.Commands.Projects;
+﻿using App.Commands.Projects;
 using App.Commands.Tasks;
 using App.Migrations;
 using App.Repositories;
@@ -34,6 +34,7 @@ static class Program
       var dbRepository = (IDbRepository)new DbRepository(settingsProvider.ConnectionString);
 
       rootCommand.Add(new ProjectCommand(dbRepository));
+      rootCommand.Add(new TaskCommand(dbRepository));
 
       return await rootCommand.InvokeAsync(args);
    }

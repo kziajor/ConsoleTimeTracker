@@ -1,8 +1,9 @@
-namespace App.Repositories;
+﻿namespace App.Repositories;
 
 public interface IDbRepository
 {
    IProjectsRepository Projects { get; }
+   ITasksRepository Tasks { get; }
 }
 
 public class DbRepository : IDbRepository
@@ -10,7 +11,7 @@ public class DbRepository : IDbRepository
    private readonly string _connectionsString;
 
    public IProjectsRepository Projects => new ProjectsRepository(_connectionsString);
-
+   public ITasksRepository Tasks => new TasksRepository(_connectionsString);
 
    public DbRepository(string connectionsString)
    {

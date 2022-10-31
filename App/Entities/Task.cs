@@ -1,10 +1,22 @@
-﻿namespace Cli.Entities;
+﻿using Dapper.Contrib.Extensions;
 
+namespace App.Entities;
+
+[Table("tasks")]
 public class Task
 {
-   public int Id { get; set; }
-   public string Title { get; set; } = string.Empty;
-   public float PlannedTime { get; set; }
-   public bool Closed { get; set; }
-   public int RelProjectId { get; set; }
+   [Key]
+   public int id { get; set; }
+   public string title { get; set; } = string.Empty;
+   public int planned_time { get; set; }
+   public bool closed { get; set; } = false;
+   public int rel_project_id { get; set; }
+
+   [Write(false)]
+   [Computed]
+   public Project? Project { get; set; }
+
+   [Write(false)]
+   [Computed]
+   public int SpentTime { get; set; }
 }
