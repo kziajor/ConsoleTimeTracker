@@ -15,7 +15,7 @@ namespace App.Commands.Projects
 
          Add(new AddProjectCommand(_dbRepository));
          Add(new EditProjectCommand(_dbRepository));
-         Add(new ShowProjectCommand(dbRepository));
+         Add(new ShowProjectCommand(_dbRepository));
 
          var closedOption = new Option<bool>(
                name: "--closed",
@@ -35,7 +35,7 @@ namespace App.Commands.Projects
             ? _dbRepository.Projects.GetClosed()
             : _dbRepository.Projects.GetActive();
 
-         ProjectCommon.DisplayProjectsList(projects, closed ? "Closed projects" : "Active projects");
+         ProjectCommon.DisplayProjectsList(projects.OrderBy(p => p.id), closed ? "Closed projects" : "Active projects");
       }
    }
 }

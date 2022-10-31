@@ -43,37 +43,19 @@ public class EditProjectCommand : Command
 
    private void EditProjectHandler(int projectId, string name, bool? active)
    {
-      IEnumerable<Project>? projects = null;
-      Project? project;
+      Project? project = ProjectCommon.GetOrChoose(_dbRepository, projectId);
 
-      if (projectId <= 0)
+      if (project is null)
       {
-         projects = _dbRepository.Projects.GetAll();
-
-         if (!projects.Any())
-         {
-            AnsiConsole.MarkupLine("[red]Projects not found. You have to add one first.[/]");
-            return;
-         }
-
-         project = ProjectCommon.AskForProjectId(projects);
-      }
-      else
-      {
-         project = _dbRepository.Projects.Get(projectId);
-
-         if (project == null)
-         {
-            AnsiConsole.MarkupLine($"[red]Project with id {projectId} not found.[/]");
-            return;
-         }
+         AnsiConsole.MarkupLine("[red]Project not found[/]");
+         return;
       }
 
-      if (name.IsNullOrEmpty()) { name = ProjectCommon.AskForProjectName(true, "Project name (leave empty if not changed):"); }
+      if (name.IsNullOrEmpty()) { name = CommandCommon.AskForWithEmptyAllowed<string>("Project name (leave empty if not changed):") ?? string.Empty; }
 
-      active ??= ProjectCommon.AskIsProjectActive();
-      project.Name = name.IsNullOrEmpty() ? project.Name : name;
-      project.Closed = !active.Value;
+      active ??= CommandCommon.AskForYesNo("Project active");
+      project.name = name.IsNullOrEmpty() ? project.name : name;
+      project.closed = !active.Value;
 
       var success = _dbRepository.Projects.Update(project);
 
@@ -84,8 +66,8 @@ public class EditProjectCommand : Command
       else
       {
          AnsiConsole.MarkupLine("[green]Project updated successfully[/]");
-         projects ??= _dbRepository.Projects.GetActive();
-         ProjectCommon.DisplayProjectsList(projects.Where(p => !p.Closed), "Active projects");
+         AnsiConsole.WriteLine();
+         ProjectCommon.DisplayProjectsList(_dbRepository.Projects.GetActive().OrderBy(p => p.id), "Active projects");
       }
    }
 }

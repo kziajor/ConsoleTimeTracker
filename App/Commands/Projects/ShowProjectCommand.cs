@@ -39,6 +39,4 @@ public class ShowProjectCommand : Command
 
       ProjectCommon.ShowProjectDetails(project);
    }
-
-
 }

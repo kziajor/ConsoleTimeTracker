@@ -1,6 +1,6 @@
 ﻿using App.Entities;
 using App.Extensions;
-
+using App.Repositories;
 using Spectre.Console;
 
 namespace App.Commands.Projects
@@ -19,54 +19,29 @@ namespace App.Commands.Projects
 
          foreach (var project in projects)
          {
-            table.AddRow(project.Id.ToString(), project.Name, project.Closed ? "" : "[green]X[/]");
+            table.AddRow(project.id.ToString(), project.name, project.closed ? "" : "[green]X[/]");
          }
 
          AnsiConsole.MarkupLineInterpolated($"[green]{header}[/]");
          AnsiConsole.Write(table);
       }
 
-      public static string AskForProjectName(bool allowEmpty = false, string customPrompt = "")
+      public static void ShowProjectDetails(Project project)
       {
-         var promptMessage = customPrompt.IsNullOrEmpty() ? "Project name:" : customPrompt;
-         var prompt = new TextPrompt<string>(promptMessage)
-                     .PromptStyle("green");
-
-         if (allowEmpty) { prompt.AllowEmpty(); }
-
-         return AnsiConsole.Prompt(prompt);
+         AnsiConsole.Console.WriteKeyValuePair("Id", project.id.ToString());
+         AnsiConsole.Console.WriteKeyValuePair("Name", project.name);
+         AnsiConsole.Console.WriteKeyValuePair("Active", project.closed ? "No" : "Yes");
       }
 
-      public static bool AskIsProjectActive()
+      public static Project? GetOrChoose(IDbRepository dbRepository, int? projectId = null, IEnumerable<Project>? projects = null)
       {
-         var choice = AnsiConsole.Prompt(
-               new SelectionPrompt<string>()
-                  .Title("Is project active")
-                  .AddChoices(new[] { "Yes", "No" })
-            );
+         if (projectId is null || projectId <= 0)
+         {
+            return (projects ?? dbRepository.Projects.GetActive())
+               .ChooseOne("Choose project", 20, (project) => project.GetOptionLabel());
+         }
 
-         return choice == "Yes";
-      }
-
-      public static Project AskForProjectId(IEnumerable<Project> projects)
-      {
-         return AnsiConsole.Prompt(
-               new SelectionPrompt<Project>()
-                  .Title("Choose project")
-                  .AddChoices(projects)
-                  .UseConverter((project) =>
-                  {
-                     var activityLabel = project.Closed ? "not active" : "active";
-                     return $"{project.Id}\t{project.Name} ({activityLabel})";
-                  })
-            );
-      }
-
-      public static void ShowProjectDetails(Project? project)
-      {
-         AnsiConsole.Console.WriteKeyValuePair("Id", project.Id.ToString());
-         AnsiConsole.Console.WriteKeyValuePair("Name", project.Name);
-         AnsiConsole.Console.WriteKeyValuePair("Active", project.Closed ? "No" : "Yes");
+         return dbRepository.Projects.Get(projectId.Value);
       }
    }
 }

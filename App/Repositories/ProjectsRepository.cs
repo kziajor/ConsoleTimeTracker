@@ -48,7 +48,7 @@ public class ProjectsRepository : BaseRepository, IProjectsRepository
 
       if (result == 0) { return null; }
 
-      project.Id = Convert.ToInt32(result);
+      project.id = Convert.ToInt32(result);
 
       return project;
    }

@@ -1,4 +1,4 @@
-﻿namespace App.Repositories;
+namespace App.Repositories;
 
 public interface IDbRepository
 {
@@ -9,9 +9,8 @@ public class DbRepository : IDbRepository
 {
    private readonly string _connectionsString;
 
-   private ProjectsRepository? projects;
+   public IProjectsRepository Projects => new ProjectsRepository(_connectionsString);
 
-   public IProjectsRepository Projects => projects ??= new ProjectsRepository(_connectionsString);
 
    public DbRepository(string connectionsString)
    {

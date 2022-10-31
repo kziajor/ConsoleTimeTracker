@@ -29,9 +29,9 @@ namespace App.Commands.Projects
 
       private void AddProjectHandler(string projectName)
       {
-         if (projectName.IsNullOrEmpty()) { projectName = ProjectCommon.AskForProjectName(); }
+         if (projectName.IsNullOrEmpty()) { projectName = CommandCommon.AskFor<string>("Project name"); }
 
-         var result = _dbRepository.Projects.Add(new Project { Name = projectName });
+         var result = _dbRepository.Projects.Add(new Project { name = projectName });
 
          if (result is null)
          {
@@ -40,10 +40,8 @@ namespace App.Commands.Projects
          }
 
          AnsiConsole.MarkupLine("[green]New project added[/]");
-
-         var projects = _dbRepository.Projects.GetActive();
-
-         ProjectCommon.DisplayProjectsList(projects, "Active projects");
+         AnsiConsole.WriteLine();
+         ProjectCommon.DisplayProjectsList(_dbRepository.Projects.GetActive().OrderBy(p => p.id), "Active projects");
       }
    }
 }

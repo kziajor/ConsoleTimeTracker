@@ -6,7 +6,7 @@ namespace App.Entities;
 public class Project
 {
    [Key]
-   public int Id { get; set; }
-   public string Name { get; set; } = string.Empty;
-   public bool Closed { get; set; }
+   public int id { get; set; }
+   public string name { get; set; } = string.Empty;
+   public bool closed { get; set; }
 }
