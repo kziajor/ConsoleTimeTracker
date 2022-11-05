@@ -1,11 +1,13 @@
-﻿namespace Cli.Entities;
+﻿namespace App.Entities;
 
-public class Record
+public sealed class Record
 {
-   public int? Id { get; set; }
-   public DateTime StartedAt { get; set; }
-   public DateTime? StopedAt { get; set; }
-   public int MinutesSpent { get; set; } = 0;
-   public string Comment { get; set; } = string.Empty;
-   public int RelTaskId { get; set; }
+   public int? RE_Id { get; set; }
+   public DateTime RE_StartedAt { get; set; }
+   public DateTime? RE_StopedAt { get; set; }
+   public int RE_MinutesSpent { get; set; } = 0;
+   public string RE_Comment { get; set; } = string.Empty;
+   public int RE_RelTaskId { get; set; }
+   public Task? Task { get; set; }
+   public Project? Project { get; set; }
 }

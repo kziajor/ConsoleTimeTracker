@@ -3,41 +3,39 @@ using System.Data;
 
 namespace App.Migrations.MigrationScripts;
 
-public class Script_004_AddExternalSystemTypeAndTaskIdColumnsInTasksTable : IScript
+public sealed class Script_004_AddExternalSystemTypeAndTaskIdColumnsInTasksTable : IScript
 {
-   private string _scriptAddingExternalSystemTypeColumn =>
+   private string ScriptAddingExternalSystemTypeColumn =>
       @"
-      ALTER TABLE tasks
-      ADD COLUMN external_system_type INTEGER NULL;
+         ALTER TABLE Tasks
+         ADD COLUMN TA_ExternalSystemType INTEGER NULL;
       ";
 
-   private string _scriptAddingExternalSystemTaskIdColumn =>
+   private string ScriptAddingExternalSystemTaskIdColumn =>
       @"
-      ALTER TABLE tasks
-      ADD COLUMN external_system_task_id INTEGER NULL;
+         ALTER TABLE Tasks
+         ADD COLUMN TA_ExternalSystemTaskId TEXT NULL;
       ";
 
-   private string _preConditionCheckForExternalSystemTypeColumn =>
-      "SELECT count(*) FROM pragma_table_info('tasks') WHERE name = 'external_system_type';";
+   private string PreConditionCheckForExternalSystemTypeColumn =>
+      "SELECT count(*) FROM pragma_table_info('Tasks') WHERE name = 'TA_ExternalSystemType';";
 
-   private string _preConditionCheckForExternalSystemTaskIdColumn =>
-      "SELECT count(*) FROM pragma_table_info('tasks') WHERE name = 'external_system_task_id';";
-
-   public string? PostConditionCheck => throw new NotImplementedException();
+   private string PreConditionCheckForExternalSystemTaskIdColumn =>
+      "SELECT count(*) FROM pragma_table_info('Tasks') WHERE name = 'TA_ExternalSystemTaskId';";
 
    public string ProvideScript(Func<IDbCommand> dbCommandFactory)
    {
       var command = dbCommandFactory();
-      command.CommandText = _preConditionCheckForExternalSystemTypeColumn;
+      command.CommandText = PreConditionCheckForExternalSystemTypeColumn;
 
       var externalSystemTypeColumnExists = Convert.ToInt64(command.ExecuteScalar() ?? 0);
 
-      command.CommandText = _preConditionCheckForExternalSystemTaskIdColumn;
+      command.CommandText = PreConditionCheckForExternalSystemTaskIdColumn;
 
       var externalSystemTaskIdColumnExists = Convert.ToInt64(command.ExecuteScalar() ?? 0);
 
-      var result = externalSystemTypeColumnExists == 0 ? _scriptAddingExternalSystemTypeColumn : "";
-      result += externalSystemTaskIdColumnExists == 0 ? _scriptAddingExternalSystemTaskIdColumn : "";
+      var result = externalSystemTypeColumnExists == 0 ? ScriptAddingExternalSystemTypeColumn : "";
+      result += externalSystemTaskIdColumnExists == 0 ? ScriptAddingExternalSystemTaskIdColumn : "";
 
       return result;
    }

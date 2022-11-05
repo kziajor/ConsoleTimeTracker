@@ -1,22 +1,15 @@
-﻿using Dapper.Contrib.Extensions;
+﻿namespace App.Entities;
 
-namespace App.Entities;
-
-[Table("tasks")]
-public class Task
+public sealed class Task
 {
-   [Key]
-   public int id { get; set; }
-   public string title { get; set; } = string.Empty;
-   public int planned_time { get; set; }
-   public bool closed { get; set; } = false;
-   public int rel_project_id { get; set; }
+   public int TA_Id { get; set; }
+   public string TA_Title { get; set; } = string.Empty;
+   public int TA_PlannedTime { get; set; }
+   public bool TA_Closed { get; set; } = false;
+   public int TA_SpentTime { get; set; }
+   public int TA_RelProjectId { get; set; }
+   public int? TA_ExternalSystemType { get; set; }
+   public string? TA_ExternalSystemTaskId { get; set; }
 
-   [Write(false)]
-   [Computed]
    public Project? Project { get; set; }
-
-   [Write(false)]
-   [Computed]
-   public int SpentTime { get; set; }
 }

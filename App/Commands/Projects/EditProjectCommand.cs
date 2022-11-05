@@ -54,8 +54,8 @@ public class EditProjectCommand : Command
       if (name.IsNullOrEmpty()) { name = CommandCommon.AskForWithEmptyAllowed<string>("Project name (leave empty if not changed):") ?? string.Empty; }
 
       active ??= CommandCommon.AskForYesNo("Project active");
-      project.name = name.IsNullOrEmpty() ? project.name : name;
-      project.closed = !active.Value;
+      project.PR_Name = name.IsNullOrEmpty() ? project.PR_Name : name;
+      project.PR_Closed = !active.Value;
 
       var success = _dbRepository.Projects.Update(project);
 
@@ -67,7 +67,7 @@ public class EditProjectCommand : Command
       {
          AnsiConsole.MarkupLine("[green]Project updated successfully[/]");
          AnsiConsole.WriteLine();
-         ProjectCommon.DisplayProjectsList(_dbRepository.Projects.GetActive().OrderBy(p => p.id), "Active projects");
+         ProjectCommon.DisplayProjectsList(_dbRepository.Projects.GetActive().OrderBy(p => p.PR_Id), "Active projects");
       }
    }
 }

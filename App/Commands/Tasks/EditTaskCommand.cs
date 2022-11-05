@@ -62,7 +62,7 @@ public class EditTaskCommand : Command
 
       if (title.IsNullOrEmpty()) { title = CommandCommon.AskForWithEmptyAllowed<string>("Task name (leave empty if not changed):") ?? string.Empty; }
 
-      var projects = _dbRepository.Projects.GetActive().Prepend(new Project() { id = 0, name = "<Leave current>" }).ToList();
+      var projects = _dbRepository.Projects.GetActive().Prepend(new Project() { PR_Id = 0, PR_Name = "<Leave current>" }).ToList();
       Project? project = ProjectCommon.GetOrChoose(_dbRepository, projectId, projects);
 
       if (project is null)
@@ -74,10 +74,10 @@ public class EditTaskCommand : Command
       active ??= CommandCommon.AskForYesNo("Task active");
       plannedTime = plannedTime <= 0 ? CommandCommon.AskForWithEmptyAllowed<int?>("Planned time (leave empty if not changed):") ?? 0 : plannedTime;
 
-      task.title = title.IsNullOrEmpty() ? task.title : title;
-      task.rel_project_id = project.id <= 0 ? task.rel_project_id : project.id;
-      task.closed = !active.Value;
-      task.planned_time = plannedTime is null || plannedTime < 0 ? task.planned_time : plannedTime.Value;
+      task.TA_Title = title.IsNullOrEmpty() ? task.TA_Title : title;
+      task.TA_RelProjectId = project.PR_Id <= 0 ? task.TA_RelProjectId : project.PR_Id;
+      task.TA_Closed = !active.Value;
+      task.TA_PlannedTime = plannedTime is null || plannedTime < 0 ? task.TA_PlannedTime : plannedTime.Value;
 
       var success = _dbRepository.Tasks.Update(task);
 
@@ -89,7 +89,7 @@ public class EditTaskCommand : Command
       {
          AnsiConsole.MarkupLine("[green]Task updated successfully[/]");
          AnsiConsole.WriteLine();
-         TaskCommon.DisplayTasksList(_dbRepository.Tasks.GetActive().OrderBy(t => t.id), "Active tasks");
+         TaskCommon.DisplayTasksList(_dbRepository.Tasks.GetActive().OrderBy(t => t.TA_Id), "Active tasks");
       }
    }
 }

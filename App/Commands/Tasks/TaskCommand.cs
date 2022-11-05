@@ -35,6 +35,6 @@ public class TaskCommand : Command
          ? _dbRepository.Tasks.GetClosed()
          : _dbRepository.Tasks.GetActive();
 
-      TaskCommon.DisplayTasksList(tasks.OrderBy(t => t.id), closed ? "Closed tasks" : "Active tasks");
+      TaskCommon.DisplayTasksList(tasks.OrderBy(t => t.TA_Id), closed ? "Closed tasks" : "Active tasks");
    }
 }

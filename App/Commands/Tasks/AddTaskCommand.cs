@@ -45,16 +45,16 @@ namespace App.Commands.Tasks
             projectId = _dbRepository.Projects
                .GetActive()
                .ChooseOne("Choose project", 20, (p) => p.GetOptionLabel())
-               ?.id ?? 0;
+               ?.PR_Id ?? 0;
          }
          if (plannedTime <= 0) { plannedTime = CommandCommon.AskFor<int>("Planned time in minutes"); }
 
-         var result = _dbRepository.Tasks.Add(new Task
+         var result = _dbRepository.Tasks.Insert(new Task
          {
-            title = taskTitle,
-            rel_project_id = projectId,
-            planned_time = plannedTime,
-            closed = false,
+            TA_Title = taskTitle,
+            TA_RelProjectId = projectId,
+            TA_PlannedTime = plannedTime,
+            TA_Closed = false,
          });
 
          if (result is null)
@@ -65,7 +65,7 @@ namespace App.Commands.Tasks
 
          AnsiConsole.MarkupLine("[green]New task added[/]");
          AnsiConsole.WriteLine();
-         TaskCommon.DisplayTasksList(_dbRepository.Tasks.GetActive().OrderBy(t => t.id), "Active tasks");
+         TaskCommon.DisplayTasksList(_dbRepository.Tasks.GetActive().OrderBy(t => t.TA_Id), "Active tasks");
       }
    }
 }

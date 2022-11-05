@@ -6,7 +6,7 @@ internal static class TaskExtensions
 {
    public static string GetOptionLabel(this Task task)
    {
-      var activityLabel = task.closed ? "not active" : "active";
-      return $"{task.id}\t{task.title} ({activityLabel})";
+      var activityLabel = task.TA_Closed ? "not active" : "active";
+      return $"{task.TA_Id}\t{task.TA_Title} ({activityLabel})";
    }
 }

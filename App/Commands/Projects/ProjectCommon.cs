@@ -11,7 +11,7 @@ namespace App.Commands.Projects
       {
          var table = new Table();
 
-         table.Border(TableBorder.Rounded);
+         table.Border = TableBorder.Rounded;
 
          table.AddColumn(new TableColumn("[green]Id[/]").LeftAligned());
          table.AddColumn(new TableColumn("[green]Name[/]").LeftAligned());
@@ -19,7 +19,7 @@ namespace App.Commands.Projects
 
          foreach (var project in projects)
          {
-            table.AddRow(project.id.ToString(), project.name, project.closed ? "" : "[green]X[/]");
+            table.AddRow(project.PR_Id.ToString(), project.PR_Name, project.PR_Closed ? "" : "[green]X[/]");
          }
 
          AnsiConsole.MarkupLineInterpolated($"[green]{header}[/]");
@@ -28,9 +28,9 @@ namespace App.Commands.Projects
 
       public static void ShowProjectDetails(Project project)
       {
-         AnsiConsole.Console.WriteKeyValuePair("Id", project.id.ToString());
-         AnsiConsole.Console.WriteKeyValuePair("Name", project.name);
-         AnsiConsole.Console.WriteKeyValuePair("Active", project.closed ? "No" : "Yes");
+         AnsiConsole.Console.WriteKeyValuePair("Id", project.PR_Id.ToString());
+         AnsiConsole.Console.WriteKeyValuePair("Name", project.PR_Name);
+         AnsiConsole.Console.WriteKeyValuePair("Active", project.PR_Closed ? "No" : "Yes");
       }
 
       public static Project? GetOrChoose(IDbRepository dbRepository, int? projectId = null, IEnumerable<Project>? projects = null)

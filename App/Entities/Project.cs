@@ -1,12 +1,8 @@
-﻿using Dapper.Contrib.Extensions;
+﻿namespace App.Entities;
 
-namespace App.Entities;
-
-[Table("projects")]
-public class Project
+public sealed class Project
 {
-   [Key]
-   public int id { get; set; }
-   public string name { get; set; } = string.Empty;
-   public bool closed { get; set; }
+   public int PR_Id { get; set; }
+   public string PR_Name { get; set; } = string.Empty;
+   public bool PR_Closed { get; set; }
 }
