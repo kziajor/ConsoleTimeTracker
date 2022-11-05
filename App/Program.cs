@@ -15,16 +15,16 @@ static class Program
    {
       var settingsProvider = new SettingsProvider();
 
-      if (settingsProvider.DisplayTitle)
-      {
-         DisplayTitle();
-      }
+      if (settingsProvider.ClearConsoleAfterEveryCommand) { AnsiConsole.Clear(); }
+
+      DisplayTitle(settingsProvider);
 
       EnsureDbDataDirectoryExists(settingsProvider.DbFile);
 
       DbMigrator.Migrate(settingsProvider.ConnectionString);
 
       ShowBasicInfo(settingsProvider);
+      AnsiConsole.WriteLine();
 
       var rootCommand = new RootCommand("Console Time Tracker")
       {
@@ -36,12 +36,31 @@ static class Program
       rootCommand.Add(new ProjectCommand(dbRepository));
       rootCommand.Add(new TaskCommand(dbRepository));
 
-      return await rootCommand.InvokeAsync(args);
+      var result = await rootCommand.InvokeAsync(args);
+
+      AnsiConsole.WriteLine();
+      AnsiConsole.Write(new Rule().RuleStyle("green"));
+
+      return result;
    }
 
-   private static void DisplayTitle()
+   private static void DisplayTitle(SettingsProvider settingsProvider)
    {
-      AnsiConsole.Write(new FigletText("ConsoleTT").Color(Color.Green));
+      AnsiConsole.WriteLine();
+      if (settingsProvider.DisplayLargeAppName)
+      {
+         AnsiConsole.Write(new Rule().RuleStyle("green"));
+         AnsiConsole.Write(new FigletText("ConsoleTT").Color(Color.Green));
+      }
+      else
+      {
+         var rule = new Rule("[green]ConsoleTT[/]")
+            .LeftAligned()
+            .RuleStyle("green");
+
+         AnsiConsole.Write(rule);
+         AnsiConsole.WriteLine();
+      }
    }
 
    private static void EnsureDbDataDirectoryExists(FileInfo dbDataFile)
@@ -59,8 +78,8 @@ static class Program
 
    private static void ShowBasicInfo(SettingsProvider settingsProvider)
    {
-      AnsiConsole.MarkupLine($"Database file: [green]{settingsProvider.DbFile.FullName}[/]");
       AnsiConsole.WriteLine();
+      AnsiConsole.MarkupLine($"Database file: [green]{settingsProvider.DbFile.FullName}[/]");
       AnsiConsole.WriteLine();
    }
 }
