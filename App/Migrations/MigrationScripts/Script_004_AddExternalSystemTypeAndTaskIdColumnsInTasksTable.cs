@@ -5,22 +5,22 @@ namespace App.Migrations.MigrationScripts;
 
 public sealed class Script_004_AddExternalSystemTypeAndTaskIdColumnsInTasksTable : IScript
 {
-   private string ScriptAddingExternalSystemTypeColumn =>
+   private static string ScriptAddingExternalSystemTypeColumn =>
       @"
          ALTER TABLE Tasks
          ADD COLUMN TA_ExternalSystemType INTEGER NULL;
       ";
 
-   private string ScriptAddingExternalSystemTaskIdColumn =>
+   private static string ScriptAddingExternalSystemTaskIdColumn =>
       @"
          ALTER TABLE Tasks
          ADD COLUMN TA_ExternalSystemTaskId TEXT NULL;
       ";
 
-   private string PreConditionCheckForExternalSystemTypeColumn =>
+   private static string PreConditionCheckForExternalSystemTypeColumn =>
       "SELECT count(*) FROM pragma_table_info('Tasks') WHERE name = 'TA_ExternalSystemType';";
 
-   private string PreConditionCheckForExternalSystemTaskIdColumn =>
+   private static string PreConditionCheckForExternalSystemTaskIdColumn =>
       "SELECT count(*) FROM pragma_table_info('Tasks') WHERE name = 'TA_ExternalSystemTaskId';";
 
    public string ProvideScript(Func<IDbCommand> dbCommandFactory)
