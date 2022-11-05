@@ -7,15 +7,15 @@ using Task = App.Entities.Task;
 
 namespace App.Commands.Tasks;
 
-public class ShowTaskCommand : Command
+public class TaskDetailsCommand : Command
 {
    private readonly IDbRepository _dbRepository;
 
-   public ShowTaskCommand(IDbRepository dbRepository) : base("show", "Show task details")
+   public TaskDetailsCommand(IDbRepository dbRepository) : base("details", "Show task details")
    {
       _dbRepository = dbRepository;
 
-      AddAlias("s");
+      AddAlias("d");
 
       var taskIdArgument = new Argument<int>(
             name: "id",

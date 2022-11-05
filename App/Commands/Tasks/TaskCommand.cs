@@ -1,4 +1,4 @@
-﻿using App.Repositories;
+using App.Repositories;
 using System.CommandLine;
 
 namespace App.Commands.Tasks;
@@ -14,7 +14,7 @@ public class TaskCommand : Command
 
       Add(new AddTaskCommand(dbRepository));
       Add(new EditTaskCommand(dbRepository));
-      Add(new ShowTaskCommand(dbRepository));
+      Add(new TaskDetailsCommand(dbRepository));
 
       var closedOption = new Option<bool>(
             name: "--closed",
