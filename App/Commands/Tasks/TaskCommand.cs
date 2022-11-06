@@ -1,3 +1,4 @@
+﻿using App.Commands.Tasks.Common;
 using App.Repositories;
 using System.CommandLine;
 
@@ -5,36 +6,27 @@ namespace App.Commands.Tasks;
 
 public class TaskCommand : Command
 {
-   private readonly IDbRepository _dbRepository;
-   public TaskCommand(IDbRepository dbRepository) : base("task", "Manage tasks")
-   {
-      _dbRepository = dbRepository;
+   private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
 
+   public TaskCommand() : base("task", "Manage tasks")
+   {
       AddAlias("t");
 
-      Add(new AddTaskCommand(dbRepository));
-      Add(new EditTaskCommand(dbRepository));
-      Add(new TaskDetailsCommand(dbRepository));
+      Add(new TaskAddCommand());
+      Add(new TaskEditCommand());
+      Add(new TaskDetailsCommand());
 
-      var closedOption = new Option<bool>(
-            name: "--closed",
-            getDefaultValue: () => false,
-            description: "Get closed tasks"
-         );
+      Add(TaskCommonOptions.Closed);
 
-      closedOption.AddAlias("-c");
-
-      Add(closedOption);
-
-      this.SetHandler((closed) => TaskListHandle(closed), closedOption);
+      this.SetHandler((closed) => TaskListHandle(closed), TaskCommonOptions.Closed);
    }
 
-   private void TaskListHandle(bool closed)
+   private void TaskListHandle(bool? closed)
    {
-      var tasks = closed
+      var tasks = closed ?? false
          ? _dbRepository.Tasks.GetClosed()
          : _dbRepository.Tasks.GetActive();
 
-      TaskCommon.DisplayTasksList(tasks.OrderBy(t => t.TA_Id), closed ? "Closed tasks" : "Active tasks");
+      TaskCommon.DisplayTasksList(tasks, closed ?? false ? "Closed tasks" : "Active tasks");
    }
 }

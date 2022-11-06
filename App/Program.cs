@@ -54,6 +54,7 @@ static class Program
    private static void RegisterCommands(RootCommand rootCommand)
    {
       rootCommand.Add(new ProjectCommand());
+      rootCommand.Add(new TaskCommand());
    }
    private static void DisplayTitle(IAppConsole console, ISettingsProvider settingsProvider)
    {

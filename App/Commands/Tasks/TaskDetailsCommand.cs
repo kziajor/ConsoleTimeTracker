@@ -1,4 +1,5 @@
-﻿using App.Repositories;
+﻿using App.Commands.Tasks.Common;
+using App.Repositories;
 
 using Spectre.Console;
 
@@ -9,12 +10,11 @@ namespace App.Commands.Tasks;
 
 public class TaskDetailsCommand : Command
 {
-   private readonly IDbRepository _dbRepository;
+   private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
+   private readonly IAppConsole _console = ServicesProvider.GetInstance<IAppConsole>();
 
-   public TaskDetailsCommand(IDbRepository dbRepository) : base("details", "Show task details")
+   public TaskDetailsCommand() : base("details", "Show task details")
    {
-      _dbRepository = dbRepository;
-
       AddAlias("d");
 
       var taskIdArgument = new Argument<int>(
