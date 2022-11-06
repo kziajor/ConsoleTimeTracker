@@ -1,4 +1,4 @@
-﻿using App.Models;
+using App.Models;
 using Spectre.Console;
 using System.Text.Json;
 
@@ -11,6 +11,8 @@ public interface ISettingsProvider
    FileInfo SettingsFile { get; }
    FileInfo DbFile { get; }
    string ConnectionString { get; }
+   bool DisplayLargeAppName { get; }
+   bool ClearConsoleAfterEveryCommand { get; }
 }
 
 public class SettingsProvider : ISettingsProvider
