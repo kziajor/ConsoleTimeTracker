@@ -1,3 +1,4 @@
+﻿using App.Extensions;
 using Spectre.Console;
 
 namespace App.Commands;
@@ -29,17 +30,6 @@ public static class CommandCommon
                   });
 
       return AnsiConsole.Prompt(prompt);
-   }
-
-   public static bool AskForYesNo(string promptText)
-   {
-      var choice = AnsiConsole.Prompt(
-               new SelectionPrompt<string>()
-                  .Title(promptText)
-                  .AddChoices(new[] { "Yes", "No" })
-            );
-
-      return choice == "Yes";
    }
 
    public static T ChooseOne<T>(this IEnumerable<T> choices, string promptText, int? pageSize = null, Func<T, string>? optionNameConverter = null) where T : class
