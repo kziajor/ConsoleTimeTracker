@@ -8,9 +8,17 @@ public interface IDbRepository
 
 public sealed class DbRepository : IDbRepository
 {
-   private readonly string _connectionsString;
+   private readonly string _connectionsString = string.Empty;
 
-   public IProjectsRepository Projects => new ProjectsRepository(_connectionsString);
+   private IProjectsRepository? _projectsRepository;
+   private ITasksRepository? _tasksRepository;
+   private IRecordsRepository? _recordsRepository;
+
+   public IProjectsRepository Projects => _projectsRepository ??= new ProjectsRepository(_connectionsString);
+   public ITasksRepository Tasks => _tasksRepository ??= new TasksRepository(_connectionsString);
+   public IRecordsRepository Records => _recordsRepository ??= new RecordsRepository(_connectionsString);
+
+   public DbRepository() { }
    public ITasksRepository Tasks => new TasksRepository(_connectionsString);
 
    public DbRepository(string connectionsString)
