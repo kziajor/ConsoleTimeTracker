@@ -1,41 +1,33 @@
-﻿using App.Repositories;
-
+﻿using App.Commands.Projects.Common;
+using App.Repositories;
 using System.CommandLine;
 
 namespace App.Commands.Projects
 {
    public class ProjectCommand : Command
    {
-      private readonly IDbRepository _dbRepository;
-      public ProjectCommand(IDbRepository dbRepository) : base("project", "Manage projects")
-      {
-         _dbRepository = dbRepository;
+      private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
 
+      public ProjectCommand() : base("project", "Manage projects")
+      {
          AddAlias("p");
 
-         Add(new AddProjectCommand(_dbRepository));
-         Add(new EditProjectCommand(_dbRepository));
-         Add(new ShowProjectCommand(_dbRepository));
+         Add(new ProjectAddCommand());
+         Add(new ProjectEditCommand());
+         Add(new ProjectDetailsCommand());
 
-         var closedOption = new Option<bool>(
-               name: "--closed",
-               getDefaultValue: () => false,
-               description: "Get closed projects"
-            );
-         closedOption.AddAlias("-c");
+         Add(ProjectCommonOptions.Closed);
 
-         Add(closedOption);
-
-         this.SetHandler((closed) => ProjectsListHandle(closed), closedOption);
+         this.SetHandler((closed) => ProjectsListHandle(closed), ProjectCommonOptions.Closed);
       }
 
-      private void ProjectsListHandle(bool closed)
+      private void ProjectsListHandle(bool? closed)
       {
-         var projects = closed
+         var projects = closed ?? false
             ? _dbRepository.Projects.GetClosed()
             : _dbRepository.Projects.GetActive();
 
-         ProjectCommon.DisplayProjectsList(projects.OrderBy(p => p.PR_Id), closed ? "Closed projects" : "Active projects");
+         ProjectCommon.DisplayProjectsList(projects.OrderByDescending(p => p.PR_Id), closed ?? false ? "Closed projects" : "Active projects");
       }
    }
 }

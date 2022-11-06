@@ -29,7 +29,7 @@ static class Program
          Name = "TT",
       };
 
-      var dbRepository = (IDbRepository)new DbRepository(settingsProvider.ConnectionString);
+      RegisterCommands(rootCommand);
 
       ShowBasicInfo(console, settingsProvider);
       console.WriteLine();
@@ -51,8 +51,10 @@ static class Program
       ServicesProvider.Register<ISettingsProvider, SettingsProvider>(settingsProvider);
       ServicesProvider.Register<IDbRepository, DbRepository>(dbRepository);
    }
+   private static void RegisterCommands(RootCommand rootCommand)
    {
-      AnsiConsole.WriteLine();
+      rootCommand.Add(new ProjectCommand());
+   }
    private static void DisplayTitle(IAppConsole console, ISettingsProvider settingsProvider)
    {
       console.WriteLine();
