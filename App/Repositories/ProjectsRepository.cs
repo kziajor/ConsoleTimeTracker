@@ -1,4 +1,4 @@
-using App.Entities;
+﻿using App.Entities;
 
 using Dapper;
 
@@ -20,7 +20,7 @@ public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
 
    private const string GetAllQuery = "SELECT * FROM Projects";
    private const string InsertQuery = "INSERT INTO Projects (PR_Name, PR_Closed) VALUES (@PR_Name, @PR_Closed); SELECT last_insert_rowid();";
-   private const string UpdateQuery = "UPDATE projects SET name = @PR_Name, closed = @PR_Closed WHERE id = @PR_Id";
+   private const string UpdateQuery = "UPDATE projects SET PR_Name = @PR_Name, PR_Closed = @PR_Closed WHERE PR_Id = @PR_Id";
    private static string GetByIdQuery => $"{GetAllQuery} WHERE PR_Id = @PR_Id";
    private static string GetClosedQuery => $"{GetAllQuery} WHERE PR_Closed >= 1";
    private static string GetActiveQuery => $"{GetAllQuery} WHERE PR_Closed <= 0";
