@@ -1,18 +1,20 @@
 ﻿using App.Entities;
+using App.Extensions;
 using Dapper;
 using Task = App.Entities.Task;
 
 namespace App.Repositories;
 
-public interface IRecordRepository
+public interface IRecordsRepository
 {
    Record? Insert(Record record);
    bool Update(Record record);
    Record? Get(int id);
-   IEnumerable<Record> GetAll(uint limit = 100, uint skip = 0);
+   IEnumerable<Record> GetAll(uint limit = 100, uint skip = 0, string orderBy = "RE_StartedAt DESC");
+   IEnumerable<Record> GetInProgress(string orderBy = "RE_StartedAt DESC");
 }
 
-public class RecordRepository : BaseRepository, IRecordRepository
+public sealed class RecordsRepository : BaseRepository, IRecordsRepository
 {
    private const uint _maxReturnedRecords = 1000;
 
@@ -28,17 +30,17 @@ public class RecordRepository : BaseRepository, IRecordRepository
    private const string InsertQuery =
       @"
          INSERT INTO Records
-            (RE_StartedAt, RE_StopedAt, RE_MinutesSpent, RE_Comment, RE_RelTaskId)
+            (RE_StartedAt, RE_FinishedAt, RE_MinutesSpent, RE_Comment, RE_RelTaskId)
          VALUES
-            (@RE_StartedAt, @RE_StopedAt, @RE_MinutesSpent, @RE_Comment, @RE_RelTaskId);
+            (@RE_StartedAt, @RE_FinishedAt, @RE_MinutesSpent, @RE_Comment, @RE_RelTaskId);
          SELECT last_insert_rowid();
       ";
    private const string UpdateQuery =
       @"
-         UPDATE tasks
+         UPDATE Records
          SET
             RE_StartedAt = @RE_StartedAt,
-            RE_StopedAt = @RE_StopedAt,
+            RE_FinishedAt = @RE_FinishedAt,
             RE_MinutesSpent = @RE_MinutesSpent,
             RE_Comment = @RE_Comment,
             RE_RelTaskId = @RE_RelTaskId
@@ -48,7 +50,7 @@ public class RecordRepository : BaseRepository, IRecordRepository
    private static string GetByIdQuery => $"{GetAllQuery} WHERE RE_Id = @RE_Id";
 
    #endregion
-   public RecordRepository(string connectionString) : base(connectionString) { }
+   public RecordsRepository(string connectionString) : base(connectionString) { }
 
    public Record? Insert(Record record)
    {
@@ -75,18 +77,19 @@ public class RecordRepository : BaseRepository, IRecordRepository
 
          return record;
       },
+      param: new { RE_Id = id },
       splitOn: "TA_ID, PR_ID").FirstOrDefault());
    }
 
-   public IEnumerable<Record> GetAll(uint limit = 100, uint skip = 0)
+   public IEnumerable<Record> GetAll(uint limit = 100, uint skip = 0, string orderBy = "RE_StartedAt DESC")
    {
-
+      if (orderBy.IsNullOrEmpty()) { throw new ArgumentException($"{nameof(orderBy)} parameter must have value"); }
       if (limit >= _maxReturnedRecords)
       {
          throw new ArgumentOutOfRangeException($"{nameof(limit)} value {limit} is out of range. Maximum number is {_maxReturnedRecords}");
       }
 
-      var query = $"{GetAllQuery} ORDER BY RE_StartedAt DESC LIMIT {limit} OFFSET {skip}";
+      var query = $"{GetAllQuery} ORDER BY {orderBy} LIMIT {limit} OFFSET {skip}";
 
       return Query((connection) => connection.Query<Record, Task, Project, Record>(query, (record, task, project) =>
       {
@@ -95,6 +98,21 @@ public class RecordRepository : BaseRepository, IRecordRepository
 
          return record;
       },
-      splitOn: "TA_ID, PR_ID"));
+      splitOn: "TA_Id, PR_Id"));
+   }
+
+   public IEnumerable<Record> GetInProgress(string orderBy = "RE_StartedAt DESC")
+   {
+      if (orderBy.IsNullOrEmpty()) { throw new ArgumentException($"{nameof(orderBy)} parameter must have value"); }
+
+      var query = $"{GetAllQuery} WHERE RE_FinishedAt IS NULL ORDER BY {orderBy}";
+
+      return Query((connection) => connection.Query<Record, Task, Project, Record>(query, (record, task, project) =>
+      {
+         task.Project = project;
+         record.Task = task;
+
+         return record;
+      }, splitOn: "TA_Id, PR_Id"));
    }
 }

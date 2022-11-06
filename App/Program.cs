@@ -1,4 +1,5 @@
-using App.Commands.Projects;
+﻿using App.Commands.Projects;
+using App.Commands.Records;
 using App.Commands.Tasks;
 using App.Migrations;
 using App.Repositories;
@@ -51,11 +52,14 @@ static class Program
       ServicesProvider.Register<ISettingsProvider, SettingsProvider>(settingsProvider);
       ServicesProvider.Register<IDbRepository, DbRepository>(dbRepository);
    }
+
    private static void RegisterCommands(RootCommand rootCommand)
    {
       rootCommand.Add(new ProjectCommand());
       rootCommand.Add(new TaskCommand());
+      rootCommand.Add(new RecordCommand());
    }
+
    private static void DisplayTitle(IAppConsole console, ISettingsProvider settingsProvider)
    {
       console.WriteLine();

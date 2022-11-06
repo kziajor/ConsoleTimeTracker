@@ -9,5 +9,4 @@ public sealed class Record
    public string? RE_Comment { get; set; } = string.Empty;
    public int RE_RelTaskId { get; set; }
    public Task? Task { get; set; }
-   public Project? Project { get; set; }
 }

@@ -1,9 +1,10 @@
-namespace App.Repositories;
+﻿namespace App.Repositories;
 
 public interface IDbRepository
 {
    IProjectsRepository Projects { get; }
    ITasksRepository Tasks { get; }
+   IRecordsRepository Records { get; }
 }
 
 public sealed class DbRepository : IDbRepository
@@ -19,7 +20,6 @@ public sealed class DbRepository : IDbRepository
    public IRecordsRepository Records => _recordsRepository ??= new RecordsRepository(_connectionsString);
 
    public DbRepository() { }
-   public ITasksRepository Tasks => new TasksRepository(_connectionsString);
 
    public DbRepository(string connectionsString)
    {
