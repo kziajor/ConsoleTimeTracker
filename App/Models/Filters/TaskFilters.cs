@@ -1,6 +1,6 @@
 ﻿namespace App.Models.Filters;
 
-public class TaskFilters
+public sealed class TaskFilters
 {
    public uint Limit { get; set; } = 100;
    public uint Skip { get; set; } = 0;

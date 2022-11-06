@@ -1,6 +1,6 @@
-﻿namespace App.Models;
+namespace App.Models;
 
-public class SettingsDto
+public sealed class SettingsDto
 {
    public string? DbFilePath { get; set; }
    public bool? DisplayLargeAppName { get; set; }

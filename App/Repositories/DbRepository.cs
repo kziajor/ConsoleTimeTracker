@@ -1,4 +1,4 @@
-﻿namespace App.Repositories;
+namespace App.Repositories;
 
 public interface IDbRepository
 {
@@ -6,7 +6,7 @@ public interface IDbRepository
    ITasksRepository Tasks { get; }
 }
 
-public class DbRepository : IDbRepository
+public sealed class DbRepository : IDbRepository
 {
    private readonly string _connectionsString;
 

@@ -1,4 +1,4 @@
-﻿using App.Entities;
+using App.Entities;
 using App.Extensions;
 using App.Models.Filters;
 using App.Repositories.Helpers;
@@ -19,7 +19,7 @@ public interface ITasksRepository
 
 }
 
-public class TasksRepository : BaseRepository, ITasksRepository
+public sealed class TasksRepository : BaseRepository, ITasksRepository
 {
    #region Queries
 

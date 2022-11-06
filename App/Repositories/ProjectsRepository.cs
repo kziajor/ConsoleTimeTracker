@@ -1,4 +1,4 @@
-﻿using App.Entities;
+using App.Entities;
 
 using Dapper;
 
@@ -14,7 +14,7 @@ public interface IProjectsRepository
    IEnumerable<Project> GetActive();
 }
 
-public class ProjectsRepository : BaseRepository, IProjectsRepository
+public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
 {
    #region Queries
 

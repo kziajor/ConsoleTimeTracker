@@ -2,7 +2,7 @@
 
 namespace App.Repositories.Helpers;
 
-public class QueryConditionBuilder
+public sealed class QueryConditionBuilder
 {
    private readonly List<QueryCondition> _conditions = new();
 

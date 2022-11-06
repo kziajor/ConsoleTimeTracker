@@ -1,9 +1,9 @@
-﻿using DbUp.Engine;
+using DbUp.Engine;
 using System.Data;
 
 namespace App.Migrations.MigrationScripts
 {
-   public class Script_005_RenameStopedAtColumnToFinishedAtInRecordsTable : IScript
+public sealed class Script_005_RenameStopedAtColumnToFinishedAtInRecordsTable : IScript
    {
       private static string PreConditionCheck =>
       "SELECT count(*) FROM pragma_table_info('Records') WHERE name = 'RE_FinishedAt';";

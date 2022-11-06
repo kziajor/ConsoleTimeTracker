@@ -1,4 +1,4 @@
-using App.Models;
+﻿using App.Models;
 using Spectre.Console;
 using System.Text.Json;
 
@@ -15,7 +15,7 @@ public interface ISettingsProvider
    bool ClearConsoleAfterEveryCommand { get; }
 }
 
-public class SettingsProvider : ISettingsProvider
+public sealed class SettingsProvider : ISettingsProvider
 {
    private readonly FileInfo _defaultDbFile;
 
