@@ -1,4 +1,4 @@
-using App.Entities;
+﻿using App.Entities;
 using App.Extensions;
 using App.Models.Filters;
 using App.Repositories.Helpers;
@@ -12,9 +12,9 @@ public interface ITasksRepository
    Task? Insert(Task task);
    bool Update(Task task);
    Task? Get(int id);
-   IEnumerable<Task> GetAll();
-   IEnumerable<Task> GetClosed();
-   IEnumerable<Task> GetActive();
+   IEnumerable<Task> GetAll(string orderBy = "TA_Id DESC");
+   IEnumerable<Task> GetClosed(string orderBy = "TA_Id DESC");
+   IEnumerable<Task> GetActive(string orderBy = "TA_Id DESC");
    IEnumerable<Task> GetFiltered(TaskFilters filters);
 
 }
@@ -85,9 +85,10 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
 
    }
 
-   public IEnumerable<Task> GetAll()
+   public IEnumerable<Task> GetAll(string orderBy = "TA_Id DESC")
    {
-      return Query((connection) => connection.Query<Task, Project, Task>(GetAllQuery, (task, project) =>
+      var query = $"{GetAllQuery} ORDER BY {orderBy}";
+      return Query((connection) => connection.Query<Task, Project, Task>(query, (task, project) =>
       {
          task.Project = project;
          return task;
@@ -95,9 +96,10 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
       splitOn: "PR_Id"));
    }
 
-   public IEnumerable<Task> GetClosed()
+   public IEnumerable<Task> GetClosed(string orderBy = "TA_Id DESC")
    {
-      return Query((connection) => connection.Query<Task, Project, Task>(GetClosedQuery, (task, project) =>
+      var query = $"{GetClosedQuery} ORDER BY {orderBy}";
+      return Query((connection) => connection.Query<Task, Project, Task>(query, (task, project) =>
       {
          task.Project = project;
          return task;
@@ -105,9 +107,10 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
       splitOn: "PR_Id"));
    }
 
-   public IEnumerable<Task> GetActive()
+   public IEnumerable<Task> GetActive(string orderBy = "TA_Id DESC")
    {
-      return Query((connection) => connection.Query<Task, Project, Task>(GetActiveQuery, (task, project) =>
+      var query = $"{GetActiveQuery} ORDER BY {orderBy}";
+      return Query((connection) => connection.Query<Task, Project, Task>(query, (task, project) =>
       {
          task.Project = project;
          return task;
