@@ -1,4 +1,4 @@
-﻿using Spectre.Console;
+using Spectre.Console;
 
 namespace App.Commands;
 
@@ -6,17 +6,27 @@ public static class CommandCommon
 {
    public static T AskFor<T>(string promptText)
    {
-      var prompt = new TextPrompt<T>(promptText)
-                  .PromptStyle("green");
+      var prompt = new TextPrompt<T>(promptText).PromptStyle("green");
 
       return AnsiConsole.Prompt(prompt);
    }
 
-   public static T AskForWithEmptyAllowed<T>(string promptText)
+   public static T? AskForWithEmptyAllowed<T>(string promptText, T? defaultValue = default)
    {
-      var prompt = new TextPrompt<T>(promptText)
+      var prompt = new TextPrompt<T?>(promptText)
                   .PromptStyle("green")
-                  .AllowEmpty();
+                  .AllowEmpty()
+                  .DefaultValue(defaultValue)
+                  .ShowDefaultValue()
+                  .DefaultValueStyle(new Style(decoration: Decoration.Bold))
+                  .WithConverter(choice =>
+                  {
+                     return choice switch
+                     {
+                        DateTime c => c.ToIsoString(),
+                        _ => choice?.ToString() ?? string.Empty,
+                     };
+                  });
 
       return AnsiConsole.Prompt(prompt);
    }
