@@ -1,4 +1,4 @@
-﻿using App.Commands.Projects;
+using App.Commands.Projects;
 using App.Commands.Tasks;
 using App.Migrations;
 using App.Repositories;
@@ -13,18 +13,16 @@ static class Program
 {
    static async Task<int> Main(string[] args)
    {
-      var settingsProvider = new SettingsProvider();
+      RegisterServices();
 
-      if (settingsProvider.ClearConsoleAfterEveryCommand) { AnsiConsole.Clear(); }
+      var console = ServicesProvider.GetInstance<IAppConsole>();
+      var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
 
-      DisplayTitle(settingsProvider);
+      if (settingsProvider.ClearConsoleAfterEveryCommand) { console.Clear(); }
 
+      DisplayTitle(console, settingsProvider);
       EnsureDbDataDirectoryExists(settingsProvider.DbFile);
-
       DbMigrator.Migrate(settingsProvider.ConnectionString);
-
-      ShowBasicInfo(settingsProvider);
-      AnsiConsole.WriteLine();
 
       var rootCommand = new RootCommand("Console Time Tracker")
       {
@@ -33,24 +31,35 @@ static class Program
 
       var dbRepository = (IDbRepository)new DbRepository(settingsProvider.ConnectionString);
 
-      rootCommand.Add(new ProjectCommand(dbRepository));
-      rootCommand.Add(new TaskCommand(dbRepository));
+      ShowBasicInfo(console, settingsProvider);
+      console.WriteLine();
 
       var result = await rootCommand.InvokeAsync(args);
 
-      AnsiConsole.WriteLine();
-      AnsiConsole.Write(new Rule().RuleStyle("green"));
+      console.WriteLine();
+      console.Write(new Rule().RuleStyle("green"));
 
       return result;
    }
 
-   private static void DisplayTitle(SettingsProvider settingsProvider)
+   private static void RegisterServices()
+   {
+      var settingsProvider = new SettingsProvider();
+      var dbRepository = new DbRepository(settingsProvider.ConnectionString);
+
+      ServicesProvider.Register<IAppConsole, object>(AnsiConsole.Console);
+      ServicesProvider.Register<ISettingsProvider, SettingsProvider>(settingsProvider);
+      ServicesProvider.Register<IDbRepository, DbRepository>(dbRepository);
+   }
    {
       AnsiConsole.WriteLine();
+   private static void DisplayTitle(IAppConsole console, ISettingsProvider settingsProvider)
+   {
+      console.WriteLine();
       if (settingsProvider.DisplayLargeAppName)
       {
-         AnsiConsole.Write(new Rule().RuleStyle("green"));
-         AnsiConsole.Write(new FigletText("ConsoleTT").Color(Color.Green));
+         console.Write(new Rule().RuleStyle("green"));
+         console.Write(new FigletText("ConsoleTT").Color(Color.Green));
       }
       else
       {
@@ -58,8 +67,8 @@ static class Program
             .LeftAligned()
             .RuleStyle("green");
 
-         AnsiConsole.Write(rule);
-         AnsiConsole.WriteLine();
+         console.Write(rule);
+         console.WriteLine();
       }
    }
 
@@ -76,10 +85,10 @@ static class Program
       }
    }
 
-   private static void ShowBasicInfo(SettingsProvider settingsProvider)
+   private static void ShowBasicInfo(IAppConsole console, ISettingsProvider settingsProvider)
    {
-      AnsiConsole.WriteLine();
-      AnsiConsole.MarkupLine($"Database file: [green]{settingsProvider.DbFile.FullName}[/]");
-      AnsiConsole.WriteLine();
+      console.WriteLine();
+      console.MarkupLine($"Database file: [green]{settingsProvider.DbFile.FullName}[/]");
+      console.WriteLine();
    }
 }
