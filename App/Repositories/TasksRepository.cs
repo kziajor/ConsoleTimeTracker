@@ -48,7 +48,7 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
             TA_ExternalSystemType = @TA_ExternalSystemType,
             TA_ExternalSystemTaskId = @TA_ExternalSystemTaskId
          WHERE
-            TA_Id = TA_Id
+            TA_Id = @TA_Id
       ";
    private static string GetByIdQuery => $"{GetAllQuery} WHERE TA_Id = @TA_Id";
    private static string GetActiveQuery => $"{GetAllQuery} WHERE TA_Closed <= 0";
