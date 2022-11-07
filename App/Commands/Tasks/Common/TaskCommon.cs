@@ -1,4 +1,4 @@
-﻿using App.Commands.Projects.Common;
+using App.Commands.Projects.Common;
 using App.Entities;
 using App.Extensions;
 using App.Integrations;
@@ -36,7 +36,7 @@ namespace App.Commands.Tasks.Common
                task.TA_Id.ToString(),
                $"{task.TA_ExternalSystemType?.ToString() ?? "-"}/{task.TA_ExternalSystemTaskId ?? "-"}",
                task.Project?.PR_Name ?? "",
-               task.TA_Title, 
+               task.TA_Title,
                $"{timePlannedHours} ({task.TA_PlannedTime})",
                $"{timeSpentHours} ({task.TA_SpentTime})",
                task.TA_Closed ? "" : "[green]X[/]"
@@ -88,6 +88,7 @@ namespace App.Commands.Tasks.Common
 
          var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
          var console = ServicesProvider.GetInstance<IAnsiConsole>();
+         var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
 
          var result = new Task
          {
@@ -100,7 +101,7 @@ namespace App.Commands.Tasks.Common
                ?.PR_Id ?? 0,
             TA_PlannedTime = input.PlannedTime ?? CommandCommon.AskFor<int>("Planned time in minutes"),
             TA_Closed = input.Closed ?? console.Confirm("Task closed", false),
-            TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskFor<ExternalSystemEnum>("External system"),
+            TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed<ExternalSystemEnum?>("External system", settingsProvider.ExternalSystemFirst ? settingsProvider.ExternalSystemDefaultType : null),
          };
 
          if (result.TA_ExternalSystemType is not null)

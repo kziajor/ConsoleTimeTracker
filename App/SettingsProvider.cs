@@ -1,4 +1,5 @@
-﻿using App.Models;
+﻿using App.Integrations;
+using App.Models;
 using Spectre.Console;
 using System.Text.Json;
 
@@ -13,6 +14,8 @@ public interface ISettingsProvider
    string ConnectionString { get; }
    bool DisplayLargeAppName { get; }
    bool ClearConsoleAfterEveryCommand { get; }
+   bool ExternalSystemFirst { get; set; }
+   ExternalSystemEnum ExternalSystemDefaultType { get; set; }
 }
 
 public sealed class SettingsProvider : ISettingsProvider
@@ -30,6 +33,8 @@ public sealed class SettingsProvider : ISettingsProvider
    public string ConnectionString { get; private set; } = string.Empty;
    public bool DisplayLargeAppName { get; private set; }
    public bool ClearConsoleAfterEveryCommand { get; private set; }
+   public bool ExternalSystemFirst { get; set; }
+   public ExternalSystemEnum ExternalSystemDefaultType { get; set; }
 
    #endregion
 
@@ -51,6 +56,14 @@ public sealed class SettingsProvider : ISettingsProvider
       ConnectionString = $"Data Source={DbFile}";
       DisplayLargeAppName = settingsDto?.DisplayLargeAppName ?? true;
       ClearConsoleAfterEveryCommand = settingsDto?.ClearConsoleAfterEveryCommand ?? false;
+      ExternalSystemFirst = settingsDto?.ExternalSystemFirst ?? false;
+
+      if (!Enum.TryParse(settingsDto?.ExternalSystemDefaultType, out ExternalSystemEnum externalSystemDefaultType))
+      {
+         externalSystemDefaultType = ExternalSystemEnum.Azure;
+      }
+
+      ExternalSystemDefaultType = externalSystemDefaultType;
    }
 
    private SettingsDto SettingsFileReadOrCreate()
