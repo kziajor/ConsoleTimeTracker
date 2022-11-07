@@ -2,7 +2,9 @@
 using App.Extensions;
 using App.Models.Filters;
 using App.Repositories.Helpers;
+
 using Dapper;
+
 using Task = App.Entities.Task;
 
 namespace App.Repositories;
@@ -25,9 +27,10 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
 
    private const string GetAllQuery =
       @"
-         SELECT *
+         SELECT Tasks.*, sum(RE_MinutesSpent) as 'TA_SpentTime', Projects.*
          FROM Tasks
          INNER JOIN Projects ON PR_Id = TA_RelProjectId
+         LEFT JOIN Records ON RE_RelTaskId = TA_Id
       ";
    private const string InsertQuery =
       @"

@@ -3,7 +3,9 @@ using App.Entities;
 using App.Extensions;
 using App.Models.Inputs;
 using App.Repositories;
+
 using Spectre.Console;
+
 using Task = App.Entities.Task;
 
 namespace App.Commands.Tasks.Common
@@ -19,12 +21,23 @@ namespace App.Commands.Tasks.Common
          table.AddColumn(new TableColumn("[green]Id[/]").LeftAligned());
          table.AddColumn(new TableColumn("[green]Project[/]").LeftAligned());
          table.AddColumn(new TableColumn("[green]Title[/]").LeftAligned());
-         table.AddColumn(new TableColumn("[green]Planned time (minutes)[/]").LeftAligned());
+         table.AddColumn(new TableColumn("[green]Time planned H (M)[/]").LeftAligned());
+         table.AddColumn(new TableColumn("[green]Time spent H (M)[/]").LeftAligned());
          table.AddColumn(new TableColumn("[green]Active[/]").Centered());
 
          foreach (var task in tasks)
          {
-            table.AddRow(task.TA_Id.ToString(), task.Project?.PR_Name ?? "", task.TA_Title, task.TA_PlannedTime.ToString(), task.TA_Closed ? "" : "[green]X[/]");
+            var timePlannedHours = Math.Round((double)task.TA_PlannedTime / 60, 2);
+            var timeSpentHours = Math.Round((double)task.TA_SpentTime / 60, 2);
+
+            table.AddRow(
+               task.TA_Id.ToString(),
+               task.Project?.PR_Name ?? "",
+               task.TA_Title, 
+               $"{timePlannedHours} ({task.TA_PlannedTime})",
+               $"{timeSpentHours} ({task.TA_SpentTime})",
+               task.TA_Closed ? "" : "[green]X[/]"
+            );
          }
 
          AnsiConsole.MarkupLineInterpolated($"[green]{header}[/]");
@@ -33,11 +46,23 @@ namespace App.Commands.Tasks.Common
 
       public static void ShowTaskDetails(Task task)
       {
-         AnsiConsole.Console.WriteKeyValuePair("Id", task.TA_Id.ToString());
-         AnsiConsole.Console.WriteKeyValuePair("Name", task.TA_Title);
-         AnsiConsole.Console.WriteKeyValuePair("Active", task.TA_Closed ? "No" : "Yes");
-         AnsiConsole.Console.WriteKeyValuePair("Project", task.Project?.PR_Name ?? string.Empty);
-         AnsiConsole.Console.WriteKeyValuePair("Planned time", $"{task.TA_PlannedTime} minutes");
+         var console = ServicesProvider.GetInstance<IAnsiConsole>();
+         var timePlannedHours = Math.Round((double)task.TA_PlannedTime / 60, 2);
+         var timeSpentHours = Math.Round((double)task.TA_SpentTime / 60, 2);
+
+         var grid = new Grid()
+            .AddColumn()
+            .AddColumn();
+
+         grid
+            .AddKeyValueRow("Id", task.TA_Id.ToString())
+            .AddKeyValueRow("Name", task.TA_Title)
+            .AddKeyValueRow("Active", task.TA_Closed ? "No" : "Yes")
+            .AddKeyValueRow("Project", task.Project?.PR_Name ?? string.Empty)
+            .AddKeyValueRow("Planned time", $"{timePlannedHours} h ({task.TA_PlannedTime} m)")
+            .AddKeyValueRow("Spent time", $"{timeSpentHours} h ({task.TA_SpentTime} m)");
+
+         console.Write(grid);
       }
 
       public static Task? GetOrChoose(int? taskId = null, IEnumerable<Task>? tasks = null)
