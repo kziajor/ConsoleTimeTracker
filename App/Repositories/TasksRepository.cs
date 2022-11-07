@@ -31,6 +31,9 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
          FROM Tasks
          INNER JOIN Projects ON PR_Id = TA_RelProjectId
          LEFT JOIN Records ON RE_RelTaskId = TA_Id
+         {0}
+         GROUP BY
+          TA_Id, TA_Title, TA_PlannedTime, TA_Closed, TA_RelProjectId, TA_ExternalSystemType, TA_ExternalSystemTaskId, PR_Id, PR_Name, PR_Closed
       ";
    private const string InsertQuery =
       @"
@@ -53,9 +56,9 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
          WHERE
             TA_Id = @TA_Id
       ";
-   private static string GetByIdQuery => $"{GetAllQuery} WHERE TA_Id = @TA_Id";
-   private static string GetActiveQuery => $"{GetAllQuery} WHERE TA_Closed <= 0";
-   private static string GetClosedQuery => $"{GetAllQuery} WHERE TA_Closed >= 1";
+   private static string GetByIdQuery => string.Format(GetAllQuery, "WHERE TA_Id = @TA_Id");
+   private static string GetActiveQuery => string.Format(GetAllQuery, "WHERE TA_Closed <= 0");
+   private static string GetClosedQuery => string.Format(GetAllQuery, "WHERE TA_Closed >= 1");
 
    #endregion
 
@@ -90,7 +93,7 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
 
    public IEnumerable<Task> GetAll(string orderBy = "TA_Id DESC")
    {
-      var query = $"{GetAllQuery} ORDER BY {orderBy}";
+      var query = string.Format(GetAllQuery, string.Empty) + $" ORDER BY {orderBy}";
       return Query((connection) => connection.Query<Task, Project, Task>(query, (task, project) =>
       {
          task.Project = project;
