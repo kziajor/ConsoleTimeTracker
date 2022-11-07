@@ -29,7 +29,7 @@ namespace App.Commands.Projects
             ? _dbRepository.Projects.GetClosed()
             : _dbRepository.Projects.GetActive();
 
-         ProjectCommon.DisplayProjectsList(projects.OrderByDescending(p => p.PR_Id), closed ?? false ? "Closed projects" : "Active projects");
+         ProjectCommon.DisplayProjectsList(projects, closed ?? false ? "Closed projects" : "Active projects");
       }
    }
 }

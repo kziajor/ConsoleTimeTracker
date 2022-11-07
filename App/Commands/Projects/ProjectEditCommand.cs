@@ -79,7 +79,7 @@ public class ProjectEditCommand : Command
       {
          _console.MarkupLine("[green]Project updated successfully[/]");
          _console.WriteLine();
-         ProjectCommon.DisplayProjectsList(_dbRepository.Projects.GetActive().OrderByDescending(p => p.PR_Id), "Active projects");
+         ProjectCommon.DisplayProjectsList(_dbRepository.Projects.GetActive(), "Active projects");
       }
    }
 

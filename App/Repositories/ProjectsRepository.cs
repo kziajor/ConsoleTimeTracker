@@ -1,4 +1,5 @@
 ﻿using App.Entities;
+using App.Extensions;
 
 using Dapper;
 
@@ -9,9 +10,9 @@ public interface IProjectsRepository
    Project? Insert(Project project);
    bool Update(Project project);
    Project? Get(int id);
-   IEnumerable<Project> GetAll();
-   IEnumerable<Project> GetClosed();
-   IEnumerable<Project> GetActive();
+   IEnumerable<Project> GetAll(string orderBy = "PR_Name ASC");
+   IEnumerable<Project> GetClosed(string orderBy = "PR_Name ASC");
+   IEnumerable<Project> GetActive(string orderBy = "PR_Name ASC");
 }
 
 public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
@@ -50,18 +51,21 @@ public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
       return Query((connection) => connection.QueryFirstOrDefault<Project?>(GetByIdQuery, new { PR_Id = id }));
    }
 
-   public IEnumerable<Project> GetAll()
+   public IEnumerable<Project> GetAll(string orderBy = "PR_Name ASC")
    {
-      return Query((connection) => connection.Query<Project>(GetAllQuery));
+      if (orderBy.IsNullOrEmpty()) { throw new ArgumentException($"Argument '{nameof(orderBy)}' is empty"); }
+      return Query((connection) => connection.Query<Project>($"{GetAllQuery} ORDER BY {orderBy}"));
    }
 
-   public IEnumerable<Project> GetClosed()
+   public IEnumerable<Project> GetClosed(string orderBy = "PR_Name ASC")
    {
-      return Query((connection) => connection.Query<Project>(GetClosedQuery));
+      if (orderBy.IsNullOrEmpty()) { throw new ArgumentException($"Argument '{nameof(orderBy)}' is empty"); }
+      return Query((connection) => connection.Query<Project>($"{GetClosedQuery} ORDER BY {orderBy}"));
    }
 
-   public IEnumerable<Project> GetActive()
+   public IEnumerable<Project> GetActive(string orderBy = "PR_Name ASC")
    {
-      return Query((connection) => connection.Query<Project>(GetActiveQuery));
+      if (orderBy.IsNullOrEmpty()) { throw new ArgumentException($"Argument '{nameof(orderBy)}' is empty"); }
+      return Query((connection) => connection.Query<Project>($"{GetActiveQuery} ORDER BY {orderBy}"));
    }
 }

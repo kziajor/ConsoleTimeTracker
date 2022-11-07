@@ -61,7 +61,7 @@ namespace App.Commands.Projects
 
          _console.MarkupLine("[green]New project added[/]");
          _console.WriteLine();
-         ProjectCommon.DisplayProjectsList(_dbRepository.Projects.GetActive().OrderByDescending(p => p.PR_Id), "Active projects");
+         ProjectCommon.DisplayProjectsList(_dbRepository.Projects.GetActive(), "Active projects");
       }
 
       private void Interactive(Project project, string? name, bool? closed)
