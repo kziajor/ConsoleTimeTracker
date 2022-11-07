@@ -13,7 +13,7 @@ namespace App.Commands.Projects;
 public class ProjectEditCommand : Command
 {
    private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
-   private readonly IAppConsole _console = ServicesProvider.GetInstance<IAppConsole>();
+   private readonly IAnsiConsole _console = ServicesProvider.GetInstance<IAnsiConsole>();
 
    public ProjectEditCommand() : base("edit", "Edit project")
    {

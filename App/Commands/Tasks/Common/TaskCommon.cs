@@ -58,7 +58,7 @@ namespace App.Commands.Tasks.Common
          if (input is null) throw new ArgumentNullException("Invalid task input");
 
          var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
-         var console = ServicesProvider.GetInstance<IAppConsole>();
+         var console = ServicesProvider.GetInstance<IAnsiConsole>();
 
          return new Task
          {
@@ -88,7 +88,7 @@ namespace App.Commands.Tasks.Common
       public static void UpdateTaskDataInteractive(Task task, TaskInput input)
       {
          var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
-         var console = ServicesProvider.GetInstance<IAppConsole>();
+         var console = ServicesProvider.GetInstance<IAnsiConsole>();
 
          task.TA_Title = string.IsNullOrEmpty(input.Title)
             ? CommandCommon.AskForWithEmptyAllowed("Task title", task.TA_Title) ?? string.Empty

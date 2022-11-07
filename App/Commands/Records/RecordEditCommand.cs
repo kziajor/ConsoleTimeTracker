@@ -10,7 +10,7 @@ namespace App.Commands.Records;
 public class RecordEditCommand : Command
 {
    private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
-   private readonly IAppConsole _console = ServicesProvider.GetInstance<IAppConsole>();
+   private readonly IAnsiConsole _console = ServicesProvider.GetInstance<IAnsiConsole>();
 
    public RecordEditCommand() : base("edit", "Edit record")
    {

@@ -16,7 +16,7 @@ static class Program
    {
       RegisterServices();
 
-      var console = ServicesProvider.GetInstance<IAppConsole>();
+      var console = ServicesProvider.GetInstance<IAnsiConsole>();
       var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
 
       if (settingsProvider.ClearConsoleAfterEveryCommand) { console.Clear(); }
@@ -48,7 +48,7 @@ static class Program
       var settingsProvider = new SettingsProvider();
       var dbRepository = new DbRepository(settingsProvider.ConnectionString);
 
-      ServicesProvider.Register<IAppConsole, object>(AnsiConsole.Console);
+      ServicesProvider.Register<IAnsiConsole, object>(AnsiConsole.Console);
       ServicesProvider.Register<ISettingsProvider, SettingsProvider>(settingsProvider);
       ServicesProvider.Register<IDbRepository, DbRepository>(dbRepository);
    }
@@ -60,7 +60,7 @@ static class Program
       rootCommand.Add(new RecordCommand());
    }
 
-   private static void DisplayTitle(IAppConsole console, ISettingsProvider settingsProvider)
+   private static void DisplayTitle(IAnsiConsole console, ISettingsProvider settingsProvider)
    {
       console.WriteLine();
       if (settingsProvider.DisplayLargeAppName)
@@ -92,7 +92,7 @@ static class Program
       }
    }
 
-   private static void ShowBasicInfo(IAppConsole console, ISettingsProvider settingsProvider)
+   private static void ShowBasicInfo(IAnsiConsole console, ISettingsProvider settingsProvider)
    {
       console.WriteLine();
       console.MarkupLine($"Database file: [green]{settingsProvider.DbFile.FullName}[/]");

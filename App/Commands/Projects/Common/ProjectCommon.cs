@@ -1,6 +1,7 @@
 ﻿using App.Entities;
 using App.Extensions;
 using App.Repositories;
+
 using Spectre.Console;
 
 namespace App.Commands.Projects.Common
@@ -9,7 +10,7 @@ namespace App.Commands.Projects.Common
    {
       public static void DisplayProjectsList(IEnumerable<Project> projects, string header = "Projects")
       {
-         var console = ServicesProvider.GetInstance<IAppConsole>();
+         var console = ServicesProvider.GetInstance<IAnsiConsole>();
          var table = new Table
          {
             Border = TableBorder.Rounded
@@ -29,7 +30,7 @@ namespace App.Commands.Projects.Common
 
       public static void ShowProjectDetails(Project project)
       {
-         var console = ServicesProvider.GetInstance<IAppConsole>();
+         var console = ServicesProvider.GetInstance<IAnsiConsole>();
 
          var grid = new Grid()
             .AddColumn()
