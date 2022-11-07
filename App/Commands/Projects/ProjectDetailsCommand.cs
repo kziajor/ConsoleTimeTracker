@@ -17,10 +17,13 @@ public class ProjectDetailsCommand : Command
    {
       AddAlias("d");
 
-      Add(ProjectCommonArguments.Id);
-      Add(CommandCommonOptions.InteractiveMode);
+      var idArgument = ProjectArguments.GetIdArgument();
+      var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
 
-      this.SetHandler((projectId, interactiveMode) => ShowProjectHandler(projectId, interactiveMode), ProjectCommonArguments.Id, CommandCommonOptions.InteractiveMode);
+      Add(idArgument);
+      Add(interactiveModeOption);
+
+      this.SetHandler((projectId, interactiveMode) => ShowProjectHandler(projectId, interactiveMode), idArgument, interactiveModeOption);
    }
 
    private void ShowProjectHandler(int projectId, bool interactiveMode)

@@ -2,7 +2,9 @@
 using App.Extensions;
 using App.Models.Inputs;
 using App.Repositories;
+
 using Spectre.Console;
+
 using System.CommandLine;
 
 namespace App.Commands.Tasks
@@ -16,18 +18,26 @@ namespace App.Commands.Tasks
       {
          AddAlias("a");
 
-         Add(TaskCommonOptions.Title);
-         Add(TaskCommonOptions.ProjectId);
-         Add(TaskCommonOptions.PlannedTime);
-         Add(CommandCommonOptions.InteractiveMode);
+         var titleOption = TaskOptions.GetTitleOption();
+         var projectIdOption = TaskOptions.GetProjectIdOption();
+         var plannedTimeOption = TaskOptions.GetPlannedTimeOption();
+         var closedOption = TaskOptions.GetClosedOption();
+         var interactiveMode = CommonOptions.GetInteractiveModeOption();
+
+         Add(titleOption);
+         Add(projectIdOption);
+         Add(plannedTimeOption);
+         Add(closedOption);
+         Add(interactiveMode);
 
          this.SetHandler(
             (taskInput) => AddTaskHandler(taskInput),
             new TaskInputBinder(
-               title: TaskCommonOptions.Title,
-               projectId: TaskCommonOptions.ProjectId,
-               plannedTime: TaskCommonOptions.PlannedTime,
-               interactiveMode: CommandCommonOptions.InteractiveMode
+               title: titleOption,
+               projectId: projectIdOption,
+               plannedTime: plannedTimeOption,
+               closed: closedOption,
+               interactiveMode: interactiveMode
             )
          );
       }

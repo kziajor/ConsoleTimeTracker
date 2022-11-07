@@ -1,5 +1,6 @@
 ﻿using App.Commands.Projects.Common;
 using App.Repositories;
+
 using System.CommandLine;
 
 namespace App.Commands.Projects
@@ -16,9 +17,10 @@ namespace App.Commands.Projects
          Add(new ProjectEditCommand());
          Add(new ProjectDetailsCommand());
 
-         Add(ProjectCommonOptions.Closed);
+         var closedOption = ProjectOptions.GetClosedOption();
+         Add(closedOption);
 
-         this.SetHandler((closed) => ProjectsListHandle(closed), ProjectCommonOptions.Closed);
+         this.SetHandler((closed) => ProjectsListHandle(closed), closedOption);
       }
 
       private void ProjectsListHandle(bool? closed)

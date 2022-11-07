@@ -19,15 +19,19 @@ namespace App.Commands.Projects
       {
          AddAlias("a");
 
-         Add(ProjectCommonOptions.Name);
-         Add(ProjectCommonOptions.Closed);
-         Add(CommandCommonOptions.InteractiveMode);
+         var nameOption = ProjectOptions.GetNameOption();
+         var closedOption = ProjectOptions.GetClosedOption();
+         var interactiveMode = CommonOptions.GetInteractiveModeOption();
+
+         Add(nameOption);
+         Add(closedOption);
+         Add(interactiveMode);
 
          this.SetHandler((projectInput) => AddProjectHandler(projectInput),
             new ProjectInputBinder(
-               name: ProjectCommonOptions.Name,
-               closed: ProjectCommonOptions.Closed,
-               interactiveMode: CommandCommonOptions.InteractiveMode));
+               name: nameOption,
+               closed: closedOption,
+               interactiveMode: interactiveMode));
       }
 
       private void AddProjectHandler(ProjectInput input)

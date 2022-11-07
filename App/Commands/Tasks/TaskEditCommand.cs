@@ -2,8 +2,11 @@
 using App.Extensions;
 using App.Models.Inputs;
 using App.Repositories;
+
 using Spectre.Console;
+
 using System.CommandLine;
+
 using Task = App.Entities.Task;
 
 namespace App.Commands.Tasks;
@@ -17,22 +20,29 @@ public class TaskEditCommand : Command
    {
       AddAlias("e");
 
-      Add(TaskCommonArguments.Id);
-      Add(TaskCommonOptions.Title);
-      Add(TaskCommonOptions.Closed);
-      Add(TaskCommonOptions.ProjectId);
-      Add(TaskCommonOptions.PlannedTime);
-      Add(CommandCommonOptions.InteractiveMode);
+      var idArgument = TaskArguments.GetIdArgument();
+      var titleOption = TaskOptions.GetTitleOption();
+      var projectIdOption = TaskOptions.GetProjectIdOption();
+      var plannedTimeOption = TaskOptions.GetPlannedTimeOption();
+      var closedOption = TaskOptions.GetClosedOption();
+      var interactiveMode = CommonOptions.GetInteractiveModeOption();
+
+      Add(idArgument);
+      Add(titleOption);
+      Add(projectIdOption);
+      Add(plannedTimeOption);
+      Add(closedOption);
+      Add(interactiveMode);
 
       this.SetHandler(
          (taskInput) => EditTaskHandler(taskInput),
          new TaskInputBinder(
-            id: TaskCommonArguments.Id,
-            title: TaskCommonOptions.Title,
-            closed: TaskCommonOptions.Closed,
-            projectId: TaskCommonOptions.ProjectId,
-            plannedTime: TaskCommonOptions.PlannedTime,
-            interactiveMode: CommandCommonOptions.InteractiveMode
+            id: idArgument,
+            title: titleOption,
+            projectId: projectIdOption,
+            plannedTime: plannedTimeOption,
+            closed: closedOption,
+            interactiveMode: interactiveMode
          )
       );
    }

@@ -1,5 +1,6 @@
 ﻿using App.Commands.Tasks.Common;
 using App.Repositories;
+
 using System.CommandLine;
 
 namespace App.Commands.Tasks;
@@ -16,9 +17,11 @@ public class TaskCommand : Command
       Add(new TaskEditCommand());
       Add(new TaskDetailsCommand());
 
-      Add(TaskCommonOptions.Closed);
+      var closedOption = TaskOptions.GetClosedOption();
 
-      this.SetHandler((closed) => TaskListHandle(closed), TaskCommonOptions.Closed);
+      Add(closedOption);
+
+      this.SetHandler((closed) => TaskListHandle(closed), closedOption);
    }
 
    private void TaskListHandle(bool? closed)

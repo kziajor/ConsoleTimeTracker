@@ -19,18 +19,23 @@ public class ProjectEditCommand : Command
    {
       AddAlias("e");
 
-      Add(ProjectCommonArguments.Id);
-      Add(ProjectCommonOptions.Name);
-      Add(ProjectCommonOptions.Closed);
-      Add(CommandCommonOptions.InteractiveMode);
+      var idArgument = ProjectArguments.GetIdArgument();
+      var nameOption = ProjectOptions.GetNameOption();
+      var closedOption = ProjectOptions.GetClosedOption();
+      var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
+
+      Add(idArgument);
+      Add(nameOption);
+      Add(closedOption);
+      Add(interactiveModeOption);
 
       this.SetHandler(
          (projectInput) => EditProjectHandler(projectInput),
          new ProjectInputBinder(
-            ProjectCommonArguments.Id,
-            ProjectCommonOptions.Name,
-            ProjectCommonOptions.Closed,
-            CommandCommonOptions.InteractiveMode));
+            idArgument,
+            nameOption,
+            closedOption,
+            interactiveModeOption));
    }
 
    private void EditProjectHandler(ProjectInput input)

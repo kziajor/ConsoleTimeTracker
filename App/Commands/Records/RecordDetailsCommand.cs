@@ -2,6 +2,9 @@
 using App.Entities;
 using App.Extensions;
 using App.Repositories;
+
+using Spectre.Console;
+
 using System.CommandLine;
 
 namespace App.Commands.Records;
@@ -15,10 +18,13 @@ public class RecordDetailsCommand : Command
    {
       AddAlias("d");
 
-      Add(RecordCommonArguments.Id);
-      Add(CommandCommonOptions.InteractiveMode);
+      var idArgument = RecordArguments.GetIdArgument();
+      var interactiveMode = CommonOptions.GetInteractiveModeOption();
 
-      this.SetHandler((recordId, interactiveMode) => RecordDetailsHandler(recordId, interactiveMode), RecordCommonArguments.Id, CommandCommonOptions.InteractiveMode);
+      Add(idArgument);
+      Add(interactiveMode);
+
+      this.SetHandler((recordId, interactiveMode) => RecordDetailsHandler(recordId, interactiveMode), idArgument, interactiveMode);
    }
 
    private void RecordDetailsHandler(int recordId, bool interactiveMode)

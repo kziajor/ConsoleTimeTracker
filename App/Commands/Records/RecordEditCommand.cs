@@ -2,7 +2,9 @@
 using App.Extensions;
 using App.Models.Inputs;
 using App.Repositories;
+
 using Spectre.Console;
+
 using System.CommandLine;
 
 namespace App.Commands.Records;
@@ -16,24 +18,35 @@ public class RecordEditCommand : Command
    {
       AddAlias("e");
 
-      Add(RecordCommonArguments.Id);
-      Add(RecordCommonOptions.TaskId);
-      Add(RecordCommonOptions.StartedAt);
-      Add(RecordCommonOptions.FinishedAt);
-      Add(RecordCommonOptions.Comment);
-      Add(RecordCommonOptions.ClearComment);
-      Add(RecordCommonOptions.ClearFinishedAt);
+      var idArgument = RecordArguments.GetIdArgument();
+      var taskIdOption = RecordOptions.GetTaskIdOption();
+      var startedAtOption = RecordOptions.GetStartedAtOption();
+      var finishedAtOption = RecordOptions.GetFinishedAtOption();
+      var commentOption = RecordOptions.GetCommentOption();
+      var clearCommentOption = RecordOptions.GetClearCommentOption();
+      var clearFinishedAtOption = RecordOptions.GetClearFinishedAtOption();
+      var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
+
+      Add(idArgument);
+      Add(taskIdOption);
+      Add(startedAtOption);
+      Add(finishedAtOption);
+      Add(commentOption);
+      Add(clearCommentOption);
+      Add(clearFinishedAtOption);
+      Add(interactiveModeOption);
 
       this.SetHandler(
          (recordInput) => EditRecordHandler(recordInput),
          new RecordInputBinder(
-            RecordCommonArguments.Id,
-            RecordCommonOptions.TaskId,
-            RecordCommonOptions.StartedAt,
-            RecordCommonOptions.FinishedAt,
-            RecordCommonOptions.Comment,
-            RecordCommonOptions.ClearComment,
-            RecordCommonOptions.ClearFinishedAt));
+            recordId: idArgument,
+            taskId: taskIdOption,
+            startedAt: startedAtOption,
+            finishedAt: finishedAtOption,
+            comment: commentOption,
+            interactiveMode: interactiveModeOption,
+            clearComment: clearCommentOption,
+            clearFinishedAt: clearFinishedAtOption));
    }
 
    private void EditRecordHandler(RecordInput input)

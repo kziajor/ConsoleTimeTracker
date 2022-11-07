@@ -1,9 +1,11 @@
 ﻿using App.Commands.Tasks.Common;
+using App.Extensions;
 using App.Repositories;
 
 using Spectre.Console;
 
 using System.CommandLine;
+
 using Task = App.Entities.Task;
 
 namespace App.Commands.Tasks;
@@ -11,39 +13,30 @@ namespace App.Commands.Tasks;
 public class TaskDetailsCommand : Command
 {
    private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
-   private readonly IAppConsole _console = ServicesProvider.GetInstance<IAppConsole>();
+   private readonly IAnsiConsole _console = ServicesProvider.GetInstance<IAnsiConsole>();
 
    public TaskDetailsCommand() : base("details", "Show task details")
    {
       AddAlias("d");
 
-      var taskIdArgument = new Argument<int>(
-            name: "id",
-            getDefaultValue: () => 0,
-            description: "Task id"
-         );
+      var idArgument = TaskArguments.GetIdArgument();
+      var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
 
-      Add(taskIdArgument);
+      Add(idArgument);
+      Add(interactiveModeOption);
 
-      this.SetHandler(taskId => ShowTaskHandler(taskId), taskIdArgument);
+      this.SetHandler((taskId, interactiveMode) => ShowTaskHandler(taskId, interactiveMode), idArgument, interactiveModeOption);
    }
 
-   private void ShowTaskHandler(int taskId)
+   private void ShowTaskHandler(int taskId, bool interactiveMode)
    {
-      Task? task;
-
-      if (taskId <= 0)
-      {
-         task = _dbRepository.Tasks.GetActive().ChooseOne("Choose task", 20, (task) => task.GetOptionLabel());
-      }
-      else
-      {
-         task = _dbRepository.Tasks.Get(taskId);
-      }
+      Task? task = interactiveMode
+         ? TaskCommon.GetOrChoose(taskId)
+         : _dbRepository.Tasks.Get(taskId);
 
       if (task is null)
       {
-         AnsiConsole.MarkupLineInterpolated($"Task with id {taskId} not found");
+         _console.WriteError($"Task with id {taskId} not found");
          return;
       }
 
