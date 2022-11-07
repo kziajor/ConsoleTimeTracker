@@ -1,6 +1,7 @@
 ﻿using App.Commands.Projects.Common;
 using App.Entities;
 using App.Extensions;
+using App.Integrations;
 using App.Models.Inputs;
 using App.Repositories;
 
@@ -19,6 +20,7 @@ namespace App.Commands.Tasks.Common
          table.Border(TableBorder.Rounded);
 
          table.AddColumn(new TableColumn("[green]Id[/]").LeftAligned());
+         table.AddColumn(new TableColumn("[green]External (syste/id)[/]").LeftAligned());
          table.AddColumn(new TableColumn("[green]Project[/]").LeftAligned());
          table.AddColumn(new TableColumn("[green]Title[/]").LeftAligned());
          table.AddColumn(new TableColumn("[green]Time planned H (M)[/]").LeftAligned());
@@ -32,6 +34,7 @@ namespace App.Commands.Tasks.Common
 
             table.AddRow(
                task.TA_Id.ToString(),
+               $"{task.TA_ExternalSystemType?.ToString() ?? "-"}/{task.TA_ExternalSystemTaskId ?? "-"}",
                task.Project?.PR_Name ?? "",
                task.TA_Title, 
                $"{timePlannedHours} ({task.TA_PlannedTime})",
@@ -56,6 +59,7 @@ namespace App.Commands.Tasks.Common
 
          grid
             .AddKeyValueRow("Id", task.TA_Id.ToString())
+            .AddKeyValueRow("External system", $"{task.TA_ExternalSystemType?.ToString() ?? "-"}/{task.TA_ExternalSystemTaskId ?? "-"}")
             .AddKeyValueRow("Name", task.TA_Title)
             .AddKeyValueRow("Active", task.TA_Closed ? "No" : "Yes")
             .AddKeyValueRow("Project", task.Project?.PR_Name ?? string.Empty)
@@ -85,7 +89,7 @@ namespace App.Commands.Tasks.Common
          var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
          var console = ServicesProvider.GetInstance<IAnsiConsole>();
 
-         return new Task
+         var result = new Task
          {
             TA_Title = string.IsNullOrEmpty(input.Title)
             ? CommandCommon.AskFor<string>("Task title")
@@ -96,7 +100,17 @@ namespace App.Commands.Tasks.Common
                ?.PR_Id ?? 0,
             TA_PlannedTime = input.PlannedTime ?? CommandCommon.AskFor<int>("Planned time in minutes"),
             TA_Closed = input.Closed ?? console.Confirm("Task closed", false),
+            TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskFor<ExternalSystemEnum>("External system"),
          };
+
+         if (result.TA_ExternalSystemType is not null)
+         {
+            result.TA_ExternalSystemTaskId = string.IsNullOrEmpty(input.ExternalSystemTaskId)
+               ? CommandCommon.AskFor<string>("External id")
+               : input.ExternalSystemTaskId;
+         }
+
+         return result;
       }
 
       public static Task CreateTask(TaskInput input)
@@ -107,6 +121,8 @@ namespace App.Commands.Tasks.Common
             TA_RelProjectId = input.ProjectId ?? 0,
             TA_PlannedTime = input.PlannedTime ?? 0,
             TA_Closed = input.Closed ?? false,
+            TA_ExternalSystemType = input.ExternalSystemType,
+            TA_ExternalSystemTaskId = input.ExternalSystemType is not null ? input.ExternalSystemTaskId : null,
          };
       }
 
@@ -127,6 +143,12 @@ namespace App.Commands.Tasks.Common
 
          task.TA_Closed = input.Closed ?? console.Confirm("Task closed", task.TA_Closed);
          task.TA_PlannedTime = input.PlannedTime ?? CommandCommon.AskForWithEmptyAllowed<int?>("Planned time", task.TA_PlannedTime) ?? task.TA_PlannedTime;
+         task.TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed("External system", task.TA_ExternalSystemType);
+
+         if (task.TA_ExternalSystemType is not null)
+         {
+            task.TA_ExternalSystemTaskId = input.ExternalSystemTaskId ?? CommandCommon.AskForWithEmptyAllowed("External id", task.TA_ExternalSystemTaskId);
+         }
       }
 
       public static void UpdateTaskData(Task task, TaskInput input)
@@ -135,6 +157,8 @@ namespace App.Commands.Tasks.Common
          task.TA_RelProjectId = input.ProjectId ?? task.TA_RelProjectId;
          task.TA_Closed = input.Closed ?? task.TA_Closed;
          task.TA_PlannedTime = input.PlannedTime ?? task.TA_PlannedTime;
+         task.TA_ExternalSystemType = input.ExternalSystemType ?? task.TA_ExternalSystemType;
+         task.TA_ExternalSystemTaskId = task.TA_ExternalSystemType is not null ? input.ExternalSystemTaskId ?? task.TA_ExternalSystemTaskId : null;
       }
 
       public static void ValidateModel(Task task)

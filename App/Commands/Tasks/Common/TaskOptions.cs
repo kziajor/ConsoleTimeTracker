@@ -1,4 +1,6 @@
-﻿using System.CommandLine;
+﻿using App.Integrations;
+
+using System.CommandLine;
 
 namespace App.Commands.Tasks.Common;
 
@@ -40,6 +42,24 @@ public static class TaskOptions
          name: "--planned-time",
          getDefaultValue: () => null,
          description: "Planned time"
+      );
+   }
+
+   public static Option<ExternalSystemEnum?> GetExternalSystemTypeOption()
+   {
+      return new(
+         name: "--external-system",
+         getDefaultValue: () => null,
+         description: "External system"
+      );
+   }
+
+   public static Option<string?> GetExternalSystemTaskIdOption()
+   {
+      return new(
+         name: "--external-id",
+         getDefaultValue: () => null,
+         description: "Task id in external system"
       );
    }
 }

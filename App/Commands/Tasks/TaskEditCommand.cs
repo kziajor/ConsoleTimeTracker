@@ -25,6 +25,8 @@ public class TaskEditCommand : Command
       var projectIdOption = TaskOptions.GetProjectIdOption();
       var plannedTimeOption = TaskOptions.GetPlannedTimeOption();
       var closedOption = TaskOptions.GetClosedOption();
+      var externalSystemTypeOption = TaskOptions.GetExternalSystemTypeOption();
+      var externalSystemTaskIdOption = TaskOptions.GetExternalSystemTaskIdOption();
       var interactiveMode = CommonOptions.GetInteractiveModeOption();
 
       Add(idArgument);
@@ -32,6 +34,8 @@ public class TaskEditCommand : Command
       Add(projectIdOption);
       Add(plannedTimeOption);
       Add(closedOption);
+      Add(externalSystemTypeOption);
+      Add(externalSystemTaskIdOption);
       Add(interactiveMode);
 
       this.SetHandler(
@@ -39,10 +43,12 @@ public class TaskEditCommand : Command
          new TaskInputBinder(
             id: idArgument,
             title: titleOption,
+            closed: closedOption,
             projectId: projectIdOption,
             plannedTime: plannedTimeOption,
-            closed: closedOption,
-            interactiveMode: interactiveMode
+            interactiveMode: interactiveMode,
+            externalSystemType: externalSystemTypeOption,
+            externalSystemTaskId: externalSystemTaskIdOption
          )
       );
    }

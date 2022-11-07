@@ -1,4 +1,6 @@
-﻿namespace App.Entities;
+﻿using App.Integrations;
+
+namespace App.Entities;
 
 public sealed class Task
 {
@@ -8,7 +10,7 @@ public sealed class Task
    public bool TA_Closed { get; set; } = false;
    public int TA_SpentTime { get; set; }
    public int TA_RelProjectId { get; set; }
-   public int? TA_ExternalSystemType { get; set; }
+   public ExternalSystemEnum? TA_ExternalSystemType { get; set; }
    public string? TA_ExternalSystemTaskId { get; set; }
 
    public Project? Project { get; set; }
