@@ -167,6 +167,8 @@ namespace App.Commands.Tasks.Common
          if (task.TA_Title.IsNullOrEmpty()) throw new Exception("Title is empty");
          if (task.TA_RelProjectId <= 0) throw new ArgumentOutOfRangeException("Project id out of range");
          if (task.TA_PlannedTime < 0) throw new ArgumentOutOfRangeException("Planned time less then 0");
+         // TODO: Add validationt of External system type if not null
+         // TODO: Validate that external task id is unique in scope of external system
       }
    }
 }

@@ -1,4 +1,5 @@
 ﻿using App.Repositories;
+
 using System.CommandLine;
 
 namespace App.Commands.Records;
@@ -14,6 +15,10 @@ public class RecordCommand : Command
       Add(new RecordAddCommand());
       Add(new RecordEditCommand());
       Add(new RecordDetailsCommand());
+
+      // TODO: Add param displaing records grouped by day and maybe setting
+      // TODO: Setting to set from how many days should be displayed records by default
+      // TODO: Param to set how many days sholud be displayed.
 
       this.SetHandler(() => RecordListHandle());
    }

@@ -4,7 +4,9 @@ using App.Entities;
 using App.Extensions;
 using App.Models.Inputs;
 using App.Repositories;
+
 using Spectre.Console;
+
 using Task = App.Entities.Task;
 
 namespace App.Commands.Records
@@ -94,6 +96,7 @@ namespace App.Commands.Records
       {
          if (record.RE_RelTaskId == 0) throw new Exception("Task not found");
          if (record.RE_FinishedAt < record.RE_StartedAt) throw new ArgumentOutOfRangeException("'Finished at' date is earlier than 'Started at' date");
+         // TODO: Validate that record is not in conflict with another record (dates and times)
       }
 
       public static Record? GetOrChoose(int? recordId = null, IEnumerable<Record>? records = null)
