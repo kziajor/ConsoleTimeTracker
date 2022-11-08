@@ -15,12 +15,16 @@ namespace App.Commands.Tasks.Common
    {
       public static void DisplayTasksList(IEnumerable<Task> tasks, string header = "Tasks")
       {
+         var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
          var table = new Table();
 
          table.Border(TableBorder.Rounded);
 
+         var secondaryIdHeader = settingsProvider.ExternalSystemPriority
+            ? "[green]Internal id[/]"
+            : "[green]External (system/id)[/]";
          table.AddColumn(new TableColumn("[green]Id[/]").LeftAligned());
-         table.AddColumn(new TableColumn("[green]External (syste/id)[/]").LeftAligned());
+         table.AddColumn(new TableColumn(secondaryIdHeader).LeftAligned());
          table.AddColumn(new TableColumn("[green]Project[/]").LeftAligned());
          table.AddColumn(new TableColumn("[green]Title[/]").LeftAligned());
          table.AddColumn(new TableColumn("[green]Time planned H (M)[/]").LeftAligned());
@@ -29,12 +33,19 @@ namespace App.Commands.Tasks.Common
 
          foreach (var task in tasks)
          {
+            var externalId = task.GetScopedExternalId();
+            var primaryId = settingsProvider.ExternalSystemPriority
+               ? externalId
+               : task.TA_Id.ToString();
+            var secondaryId = settingsProvider.ExternalSystemPriority
+               ? task.TA_Id.ToString()
+               : externalId;
             var timePlannedHours = Math.Round((double)task.TA_PlannedTime / 60, 2);
             var timeSpentHours = Math.Round((double)task.TA_SpentTime / 60, 2);
 
             table.AddRow(
-               task.TA_Id.ToString(),
-               $"{task.TA_ExternalSystemType?.ToString() ?? "-"}/{task.TA_ExternalSystemTaskId ?? "-"}",
+               primaryId,
+               secondaryId,
                task.Project?.PR_Name ?? "",
                task.TA_Title,
                $"{timePlannedHours} ({task.TA_PlannedTime})",
@@ -101,7 +112,7 @@ namespace App.Commands.Tasks.Common
                ?.PR_Id ?? 0,
             TA_PlannedTime = input.PlannedTime ?? CommandCommon.AskFor<int>("Planned time in minutes"),
             TA_Closed = input.Closed ?? console.Confirm("Task closed", false),
-            TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed<ExternalSystemEnum?>("External system", settingsProvider.ExternalSystemFirst ? settingsProvider.ExternalSystemDefaultType : null),
+            TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed<ExternalSystemEnum?>("External system", settingsProvider.ExternalSystemPriority ? settingsProvider.ExternalSystemDefaultType : null),
          };
 
          if (result.TA_ExternalSystemType is not null)
@@ -144,7 +155,7 @@ namespace App.Commands.Tasks.Common
 
          task.TA_Closed = input.Closed ?? console.Confirm("Task closed", task.TA_Closed);
          task.TA_PlannedTime = input.PlannedTime ?? CommandCommon.AskForWithEmptyAllowed<int?>("Planned time", task.TA_PlannedTime) ?? task.TA_PlannedTime;
-         task.TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed("External system", task.TA_ExternalSystemType);
+         task.TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed<ExternalSystemEnum?>("External system", task.TA_ExternalSystemType);
 
          if (task.TA_ExternalSystemType is not null)
          {

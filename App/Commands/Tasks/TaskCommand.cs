@@ -8,6 +8,7 @@ namespace App.Commands.Tasks;
 public class TaskCommand : Command
 {
    private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
+   private readonly ISettingsProvider settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
 
    public TaskCommand() : base("task", "Manage tasks")
    {
@@ -26,9 +27,12 @@ public class TaskCommand : Command
 
    private void TaskListHandle(bool? closed)
    {
+      var orderBy = settingsProvider.ExternalSystemPriority
+         ? "TA_ExternalSystemType ASC, TA_ExternalSystemTaskId DESC"
+         : "TA_Id DESC";
       var tasks = closed ?? false
-         ? _dbRepository.Tasks.GetClosed()
-         : _dbRepository.Tasks.GetActive();
+         ? _dbRepository.Tasks.GetClosed(orderBy)
+         : _dbRepository.Tasks.GetActive(orderBy);
 
       TaskCommon.DisplayTasksList(tasks, closed ?? false ? "Closed tasks" : "Active tasks");
    }
