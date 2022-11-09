@@ -70,6 +70,7 @@ public sealed class SettingsProvider : ISettingsProvider
 
    private SettingsDto SettingsFileReadOrCreate()
    {
+      // TODO: Add configuration wizard if file doesn't exists
       SettingsDto? settingsDto;
       if (!SettingsFile.Exists)
       {
