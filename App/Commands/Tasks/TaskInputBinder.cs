@@ -13,12 +13,12 @@ public class TaskInputBinder : BinderBase<TaskInput>
    private readonly Option<string?>? _title;
    private readonly Option<bool?>? _closed;
    private readonly Option<int?>? _projectId;
-   private readonly Option<int?>? _plannedTime;
+   private readonly Option<decimal?>? _plannedTime;
    private readonly Option<ExternalSystemEnum?>? _externalSystemType;
    private readonly Option<string?>? _externalSystemTaskId;
    private readonly Option<bool>? _interactiveMode;
 
-   public TaskInputBinder(Argument<int>? id = null, Option<string?>? title = null, Option<bool?>? closed = null, Option<int?>? projectId = null, Option<int?>? plannedTime = null, Option<bool>? interactiveMode = null, Option<ExternalSystemEnum?>? externalSystemType = null, Option<string?>? externalSystemTaskId = null)
+   public TaskInputBinder(Argument<int>? id = null, Option<string?>? title = null, Option<bool?>? closed = null, Option<int?>? projectId = null, Option<decimal?>? plannedTime = null, Option<bool>? interactiveMode = null, Option<ExternalSystemEnum?>? externalSystemType = null, Option<string?>? externalSystemTaskId = null)
    {
       _id = id;
       _title = title;

@@ -8,7 +8,7 @@ public sealed class TaskInput : BaseInput
    public string? Title { get; set; }
    public bool? Closed { get; set; }
    public int? ProjectId { get; set; }
-   public int? PlannedTime { get; set; }
+   public decimal? PlannedTime { get; set; }
    public ExternalSystemEnum? ExternalSystemType { get; set; }
    public string? ExternalSystemTaskId { get; set; }
 }
