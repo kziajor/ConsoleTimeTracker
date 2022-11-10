@@ -14,6 +14,7 @@ static class Program
 {
    static async Task<int> Main(string[] args)
    {
+      System.Console.OutputEncoding = System.Text.Encoding.UTF8; // FIX for displaing emoji icons
       RegisterServices();
 
       var console = ServicesProvider.GetInstance<IAnsiConsole>();
