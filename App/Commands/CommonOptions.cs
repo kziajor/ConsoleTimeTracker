@@ -8,7 +8,7 @@ public static class CommonOptions
    {
       var value = new Option<bool>(
             name: "--interactive",
-            getDefaultValue: () => false,
+            getDefaultValue: () => true,
             description: "Use interactive mode to fill data"
          );
       value.AddAlias("-i");
