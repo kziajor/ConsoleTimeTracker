@@ -1,4 +1,5 @@
 ﻿using App.Commands.Records.Common;
+using App.Commands.Tasks.Common;
 using App.Extensions;
 using App.Models.Inputs;
 using App.Repositories;
@@ -18,13 +19,13 @@ public class RecordAddCommand : Command
    {
       AddAlias("a");
 
-      var taskIdOption = RecordOptions.GetTaskIdOption();
+      var taskIdArgument = TaskArguments.GetIdArgument();
       var startedAtOption = RecordOptions.GetStartedAtOption();
       var finishedAtOption = RecordOptions.GetFinishedAtOption();
       var commentOption = RecordOptions.GetCommentOption();
       var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
 
-      Add(taskIdOption);
+      Add(taskIdArgument);
       Add(startedAtOption);
       Add(finishedAtOption);
       Add(commentOption);
@@ -33,7 +34,7 @@ public class RecordAddCommand : Command
       this.SetHandler(
          (recordInput) => AddRecordHandler(recordInput),
          new RecordInputBinder(
-            taskId: taskIdOption,
+            taskIdArgument: taskIdArgument,
             startedAt: startedAtOption,
             finishedAt: finishedAtOption,
             comment: commentOption,

@@ -15,30 +15,34 @@ namespace App.Commands.Records
    {
       public static void DisplayRecordsList(IEnumerable<Record> records, string header = "Records")
       {
+         var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
          var table = new Table();
 
-         table.Border(TableBorder.Rounded);
-
          table
+            .Border(TableBorder.Rounded)
             .AddColumn(new TableColumn("[green]Id[/]").LeftAligned())
+            .AddColumn(new TableColumn("[green]Task id[/]")).LeftAligned()
             .AddColumn(new TableColumn("[green]Project name[/]").LeftAligned())
             .AddColumn(new TableColumn("[green]Task title[/]").LeftAligned())
             .AddColumn(new TableColumn("[green]Started at[/]").LeftAligned())
             .AddColumn(new TableColumn("[green]Finished at[/]").LeftAligned())
-            .AddColumn(new TableColumn("[green]Time spent (M)[/]").RightAligned())
             .AddColumn(new TableColumn("[green]Time spent (H)[/]").RightAligned())
             .AddColumn(new TableColumn("[green]Comment[/]").LeftAligned());
 
          foreach (var record in records)
          {
+            var taskId = settingsProvider.ExternalSystemPriority
+               ? $"{record.Task?.ExternalFullId} ({record.Task?.TA_Id})"
+               : record.RE_RelTaskId.ToString();
+
             table.AddRow(
                new Text(record.RE_Id?.ToString() ?? string.Empty),
+               new Text(taskId?.ToString() ?? string.Empty),
                new Text(record.Task?.Project?.PR_Name ?? string.Empty),
                new Text(record.Task?.TA_Title ?? string.Empty),
                new Text(record.RE_StartedAt.ToIsoString()),
                new Text(record.RE_FinishedAt?.ToIsoString() ?? string.Empty),
-               new Text(record.RE_MinutesSpent.ToString()).RightAligned(),
-               new Text(Math.Round((double)record.RE_MinutesSpent / 60, 2).ToString()).RightAligned(),
+               new Text(record.TimeSpentHours > 0 ? record.TimeSpentHours.ToString("0.00") : "-").RightAligned(),
                new Text(record.RE_Comment ?? string.Empty)
             );
          }
@@ -52,11 +56,13 @@ namespace App.Commands.Records
          if (input is null) throw new Exception("Wrong input data");
 
          var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
+         var taskId = input.UniversalTaskId?.IsInternal == true && input.UniversalTaskId.TaskId > 0
+            ? input.UniversalTaskId.TaskId
+            : dbRepository.Tasks.Get(input.UniversalTaskId)?.TA_Id;
+
          var result = new Record
          {
-            RE_RelTaskId = input.RelTaskId is not null && input.RelTaskId > 0
-            ? input.RelTaskId.Value
-            : dbRepository.Tasks
+            RE_RelTaskId = taskId ?? dbRepository.Tasks
                .GetActive()
                .OrderByDescending(t => t.TA_Id)
                .ChooseOne("Choose task", 20, (t) => t.GetOptionLabel())
@@ -77,9 +83,14 @@ namespace App.Commands.Records
       {
          if (input is null) throw new Exception("Wrong input data");
 
+         var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
+         var taskId = input.UniversalTaskId?.IsInternal == true && input.UniversalTaskId.TaskId > 0
+            ? input.UniversalTaskId.TaskId
+            : dbRepository.Tasks.Get(input.UniversalTaskId)?.TA_Id;
+
          var result = new Record
          {
-            RE_RelTaskId = input.RelTaskId ?? 0,
+            RE_RelTaskId = taskId ?? 0,
             RE_StartedAt = input.StartedAt ?? DateTime.Now,
             RE_FinishedAt = input.FinishedAt,
             RE_Comment = input.Comment,
@@ -112,36 +123,48 @@ namespace App.Commands.Records
          return dbRepository.Records.Get(recordId.Value);
       }
 
-      public static void UpdateRecordDataInteractive(Record record, RecordInput recordInput)
+      public static void UpdateRecordDataInteractive(Record record, RecordInput input)
       {
-         if (recordInput is null) throw new Exception("Wrong input data");
+         if (input is null) throw new Exception("Wrong input data");
 
          var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
+         var taskId = input.UniversalTaskId?.IsInternal == true && input.UniversalTaskId.TaskId > 0
+            ? input.UniversalTaskId.TaskId
+            : dbRepository
+               .Tasks
+               .Get(input.UniversalTaskId)
+               ?.TA_Id;
 
-         record.RE_RelTaskId = recordInput.RelTaskId is not null && recordInput.RelTaskId > 0
-            ? recordInput.RelTaskId.Value
-            : dbRepository.Tasks
+         record.RE_RelTaskId = taskId ?? dbRepository.Tasks
                .GetActive()
                .Where(t => t.TA_Id != record.RE_RelTaskId)
                .OrderByDescending(t => t.TA_Id)
-               .Prepend(new Task() { TA_Id = record.RE_RelTaskId, TA_Title = $"[current] {record.Task?.TA_Title}".EscapeMarkup(), Project = record.Task?.Project })
-               .ChooseOne("Choose task", 20, (t) => t.GetOptionLabel())
+               .Prepend(record.Task ?? new Task())
+               ?.ChooseOne("Choose task", 20, (t) => t.GetOptionLabel(t.TA_Id == record.RE_RelTaskId))
                ?.TA_Id ?? record.RE_RelTaskId;
-         record.RE_StartedAt = recordInput.StartedAt ?? CommandCommon.AskForWithEmptyAllowed("Started at", record.RE_StartedAt);
-         record.RE_FinishedAt = recordInput.ClearFinishedAt
+         record.RE_StartedAt = input.StartedAt ?? CommandCommon.AskForWithEmptyAllowed("Started at", record.RE_StartedAt);
+         record.RE_FinishedAt = input.ClearFinishedAt
             ? null
-            : recordInput.FinishedAt ?? CommandCommon.AskForWithEmptyAllowed("Finished at", record.RE_FinishedAt);
+            : input.FinishedAt ?? CommandCommon.AskForWithEmptyAllowed("Finished at", record.RE_FinishedAt);
          record.RE_MinutesSpent = record.RE_FinishedAt is not null ? (int)record.RE_FinishedAt.Value.Subtract(record.RE_StartedAt).TotalMinutes : 0;
-         record.RE_Comment = recordInput.ClearComment
+         record.RE_Comment = input.ClearComment
             ? null
-            : recordInput.Comment ?? CommandCommon.AskForWithEmptyAllowed<string?>("Comment", record.RE_Comment);
+            : input.Comment ?? CommandCommon.AskForWithEmptyAllowed<string?>("Comment", record.RE_Comment);
       }
 
       public static void UpdateRecordData(Record record, RecordInput input)
       {
          if (input is null) throw new Exception("Wrong input data");
 
-         record.RE_RelTaskId = input.RelTaskId ?? record.RE_RelTaskId;
+         var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
+         var taskId = input.UniversalTaskId?.IsInternal == true && input.UniversalTaskId.TaskId > 0
+            ? input.UniversalTaskId.TaskId
+            : dbRepository
+               .Tasks
+               .Get(input.UniversalTaskId)
+               ?.TA_Id;
+
+         record.RE_RelTaskId = taskId ?? record.RE_RelTaskId;
          record.RE_StartedAt = input.StartedAt ?? record.RE_StartedAt;
          record.RE_FinishedAt = input.FinishedAt ?? record.RE_FinishedAt;
          record.RE_Comment = input.Comment ?? record.RE_Comment;

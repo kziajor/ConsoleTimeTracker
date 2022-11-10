@@ -8,7 +8,8 @@ namespace App.Commands.Records;
 public sealed class RecordInputBinder : BinderBase<RecordInput>
 {
    private readonly Argument<int>? _recordIdArgument;
-   private readonly Option<int?>? _taskIdOption;
+   private readonly Argument<string?>? _taskIdArgument;
+   private readonly Option<string?>? _taskIdOption;
    private readonly Option<DateTime?>? _startedAt;
    private readonly Option<DateTime?>? _finishedAt;
    private readonly Option<string?>? _comment;
@@ -16,10 +17,11 @@ public sealed class RecordInputBinder : BinderBase<RecordInput>
    private readonly Option<bool>? _clearFinishedAt;
    private readonly Option<bool>? _interactiveMode;
 
-   public RecordInputBinder(Argument<int>? recordId = null, Option<int?>? taskId = null, Option<DateTime?>? startedAt = null, Option<DateTime?>? finishedAt = null, Option<string?>? comment = null, Option<bool>? clearComment = null, Option<bool>? clearFinishedAt = null, Option<bool>? interactiveMode = null)
+   public RecordInputBinder(Argument<int>? recordId = null, Argument<string?>? taskIdArgument = null, Option<string?>? taskIdOption = null, Option<DateTime?>? startedAt = null, Option<DateTime?>? finishedAt = null, Option<string?>? comment = null, Option<bool>? clearComment = null, Option<bool>? clearFinishedAt = null, Option<bool>? interactiveMode = null)
    {
       _recordIdArgument = recordId;
-      _taskIdOption = taskId;
+      _taskIdArgument = taskIdArgument;
+      _taskIdOption = taskIdOption;
       _startedAt = startedAt;
       _finishedAt = finishedAt;
       _comment = comment;
@@ -33,7 +35,7 @@ public sealed class RecordInputBinder : BinderBase<RecordInput>
       return new RecordInput
       {
          Id = bindingContext.ParseResult.GetValueForArgumentOrDefault(_recordIdArgument),
-         RelTaskId = bindingContext.ParseResult.GetValueForOptionOrDefault(_taskIdOption),
+         TaskId = bindingContext.ParseResult.GetValueForArgumentOrDefault(_taskIdArgument) ?? bindingContext.ParseResult.GetValueForOptionOrDefault(_taskIdOption),
          StartedAt = bindingContext.ParseResult.GetValueForOptionOrDefault(_startedAt),
          FinishedAt = bindingContext.ParseResult.GetValueForOptionOrDefault(_finishedAt),
          Comment = bindingContext.ParseResult.GetValueForOptionOrDefault(_comment),

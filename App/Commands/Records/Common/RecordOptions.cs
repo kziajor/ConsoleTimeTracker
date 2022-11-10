@@ -4,9 +4,9 @@ namespace App.Commands.Records.Common;
 
 public static class RecordOptions
 {
-   public static Option<int?> GetTaskIdOption()
+   public static Option<string?> GetTaskIdOption()
    {
-      var value = new Option<int?>(
+      var value = new Option<string?>(
          name: "--task-id",
          getDefaultValue: () => null,
          description: "Task Id");

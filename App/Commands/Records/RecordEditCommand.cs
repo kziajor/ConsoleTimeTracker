@@ -40,7 +40,7 @@ public class RecordEditCommand : Command
          (recordInput) => EditRecordHandler(recordInput),
          new RecordInputBinder(
             recordId: idArgument,
-            taskId: taskIdOption,
+            taskIdOption: taskIdOption,
             startedAt: startedAtOption,
             finishedAt: finishedAtOption,
             comment: commentOption,
