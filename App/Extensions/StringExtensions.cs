@@ -16,4 +16,9 @@ public static class StringExtensions
    {
       return int.TryParse(@string, out _);
    }
+
+   public static int? ToInt(this string @string)
+   {
+      return int.TryParse(@string, out int result) ? result : null;
+   }
 }

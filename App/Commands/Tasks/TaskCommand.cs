@@ -1,6 +1,6 @@
 ﻿using App.Commands.Tasks.Common;
 using App.Repositories;
-
+using Spectre.Console;
 using System.CommandLine;
 
 namespace App.Commands.Tasks;
@@ -8,7 +8,8 @@ namespace App.Commands.Tasks;
 public class TaskCommand : Command
 {
    private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
-   private readonly ISettingsProvider settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
+   private readonly ISettingsProvider _settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
+   private readonly IAnsiConsole _console = ServicesProvider.GetInstance<IAnsiConsole>();
 
    public TaskCommand() : base("task", "Manage tasks")
    {
@@ -18,16 +19,24 @@ public class TaskCommand : Command
       Add(new TaskEditCommand());
       Add(new TaskDetailsCommand());
 
+      var taskIdArgument = TaskArguments.GetIdArgument();
       var closedOption = TaskOptions.GetClosedOption();
 
+      Add(taskIdArgument);
       Add(closedOption);
 
-      this.SetHandler((closed) => TaskListHandle(closed), closedOption);
+      this.SetHandler((taskId, closed) => TaskListHandle(taskId, closed), taskIdArgument, closedOption);
    }
 
-   private void TaskListHandle(bool? closed)
+   private void TaskListHandle(string? taskId, bool? closed)
    {
-      var orderBy = settingsProvider.ExternalSystemPriority
+      if (!string.IsNullOrEmpty(taskId))
+      {
+         TaskDetailsCommand.ShowTaskHandler(_dbRepository, _console, taskId, false);
+         return;
+      }
+
+      var orderBy = _settingsProvider.ExternalSystemPriority
          ? "TA_ExternalSystemType ASC, TA_ExternalSystemTaskId DESC"
          : "TA_Id DESC";
       var tasks = closed ?? false

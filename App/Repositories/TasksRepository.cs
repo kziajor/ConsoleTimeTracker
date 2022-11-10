@@ -1,5 +1,7 @@
 ﻿using App.Entities;
 using App.Extensions;
+using App.Integrations;
+using App.Models.Dtos;
 using App.Models.Filters;
 using App.Repositories.Helpers;
 
@@ -14,11 +16,12 @@ public interface ITasksRepository
    Task? Insert(Task task);
    bool Update(Task task);
    Task? Get(int id);
+   Task? Get(UniversalTaskId? id);
    IEnumerable<Task> GetAll(string orderBy = "TA_Id DESC");
    IEnumerable<Task> GetClosed(string orderBy = "TA_Id DESC");
    IEnumerable<Task> GetActive(string orderBy = "TA_Id DESC");
    IEnumerable<Task> GetFiltered(TaskFilters filters);
-
+   bool ExternalTaskIdExists(ExternalSystemEnum externalSystemType, string externalSystemTaskId, int excludedTaskId = -1);
 }
 
 public sealed class TasksRepository : BaseRepository, ITasksRepository
@@ -56,7 +59,9 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
          WHERE
             TA_Id = @TA_Id
       ";
+   private const string CheckExternalIdIsUniqueQuery = "SELECT count(*) FROM Tasks WHERE TA_ExternalSystemType = @ExternalSystemType AND TA_ExternalSystemTaskId = @ExternalSystemTaskId AND TA_Id <> @ExcludedTaskId";
    private static string GetByIdQuery => string.Format(GetAllQuery, "WHERE TA_Id = @TA_Id");
+   private static string GetByUniversalIdQuery => string.Format(GetAllQuery, "WHERE TA_Id = @TaskId OR (TA_ExternalSystemType = @ExternalSystemType AND TA_ExternalSystemTaskId = @ExternalSystemTaskId)");
    private static string GetActiveQuery => string.Format(GetAllQuery, "WHERE TA_Closed <= 0");
    private static string GetClosedQuery => string.Format(GetAllQuery, "WHERE TA_Closed >= 1");
 
@@ -91,37 +96,51 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
 
    }
 
+   public Task? Get(UniversalTaskId? id)
+   {
+      if (id is null) { return null; }
+
+      var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
+
+      if (id.IsInternal && id.TaskId is not null)
+      {
+         return Get(id.TaskId.Value);
+      }
+
+      var result = GetManyWithProject(GetByUniversalIdQuery, new
+      {
+         TaskId = id.TaskId ?? 0,
+         ExternalSystemType = ((int?)id.ExternalSystemType) ?? -1,
+         ExternalSystemTaskId = id.ExternalSystemTaskId ?? string.Empty,
+      }).ToList();
+
+      if (result.Count == 0) { return null; }
+      if (result.Count == 1) { return result[0]; }
+
+      if (settingsProvider.ExternalSystemPriority)
+      {
+         return result.SingleOrDefault(t => t.TA_ExternalSystemType == id.ExternalSystemType && t.TA_ExternalSystemTaskId == id.ExternalSystemTaskId) ?? result[0];
+      }
+
+      return result.SingleOrDefault(t => t.TA_Id == id.TaskId) ?? result[0];
+   }
+
    public IEnumerable<Task> GetAll(string orderBy = "TA_Id DESC")
    {
       var query = string.Format(GetAllQuery, string.Empty) + $" ORDER BY {orderBy}";
-      return Query((connection) => connection.Query<Task, Project, Task>(query, (task, project) =>
-      {
-         task.Project = project;
-         return task;
-      },
-      splitOn: "PR_Id"));
+      return GetManyWithProject(query);
    }
 
    public IEnumerable<Task> GetClosed(string orderBy = "TA_Id DESC")
    {
       var query = $"{GetClosedQuery} ORDER BY {orderBy}";
-      return Query((connection) => connection.Query<Task, Project, Task>(query, (task, project) =>
-      {
-         task.Project = project;
-         return task;
-      },
-      splitOn: "PR_Id"));
+      return GetManyWithProject(query);
    }
 
    public IEnumerable<Task> GetActive(string orderBy = "TA_Id DESC")
    {
       var query = $"{GetActiveQuery} ORDER BY {orderBy}";
-      return Query((connection) => connection.Query<Task, Project, Task>(query, (task, project) =>
-      {
-         task.Project = project;
-         return task;
-      },
-      splitOn: "PR_Id"));
+      return GetManyWithProject(query);
    }
 
    public IEnumerable<Task> GetFiltered(TaskFilters filters)
@@ -147,6 +166,28 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
          return task;
       },
       param: filters,
+      splitOn: "PR_Id"));
+   }
+
+   public bool ExternalTaskIdExists(ExternalSystemEnum externalSystemType, string externalSystemTaskId, int excludedTaskId = -1)
+   {
+      var result = Query(connection => connection.ExecuteScalar<int>(CheckExternalIdIsUniqueQuery, new
+      {
+         ExternalSystemType = externalSystemType,
+         ExternalSystemTaskId = externalSystemTaskId,
+         ExcludedTaskId = excludedTaskId,
+      }));
+      return result > 0;
+   }
+
+   private IEnumerable<Task> GetManyWithProject(string query, object? param = null)
+   {
+      return Query((connection) => connection.Query<Task, Project, Task>(query, (task, project) =>
+      {
+         task.Project = project;
+         return task;
+      },
+      param: param,
       splitOn: "PR_Id"));
    }
 }

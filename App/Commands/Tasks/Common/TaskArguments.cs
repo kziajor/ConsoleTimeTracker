@@ -4,11 +4,11 @@ namespace App.Commands.Tasks.Common;
 
 public static class TaskArguments
 {
-   public static Argument<int> GetIdArgument()
+   public static Argument<string?> GetIdArgument()
    {
       return new(
          name: "id",
-         getDefaultValue: () => 0,
+         getDefaultValue: () => null,
          description: "Task id"
       );
    }

@@ -9,7 +9,7 @@ namespace App.Commands.Tasks;
 
 public class TaskInputBinder : BinderBase<TaskInput>
 {
-   private readonly Argument<int>? _id;
+   private readonly Argument<string?>? _id;
    private readonly Option<string?>? _title;
    private readonly Option<bool?>? _closed;
    private readonly Option<int?>? _projectId;
@@ -18,7 +18,7 @@ public class TaskInputBinder : BinderBase<TaskInput>
    private readonly Option<string?>? _externalSystemTaskId;
    private readonly Option<bool>? _interactiveMode;
 
-   public TaskInputBinder(Argument<int>? id = null, Option<string?>? title = null, Option<bool?>? closed = null, Option<int?>? projectId = null, Option<decimal?>? plannedTime = null, Option<bool>? interactiveMode = null, Option<ExternalSystemEnum?>? externalSystemType = null, Option<string?>? externalSystemTaskId = null)
+   public TaskInputBinder(Argument<string?>? id = null, Option<string?>? title = null, Option<bool?>? closed = null, Option<int?>? projectId = null, Option<decimal?>? plannedTime = null, Option<bool>? interactiveMode = null, Option<ExternalSystemEnum?>? externalSystemType = null, Option<string?>? externalSystemTaskId = null)
    {
       _id = id;
       _title = title;

@@ -1,7 +1,9 @@
+using App.Assets;
 using App.Commands.Projects.Common;
 using App.Entities;
 using App.Extensions;
 using App.Integrations;
+using App.Models.Dtos;
 using App.Models.Inputs;
 using App.Repositories;
 
@@ -33,13 +35,12 @@ namespace App.Commands.Tasks.Common
 
          foreach (var task in tasks)
          {
-            var externalId = task.GetScopedExternalId();
             var primaryId = settingsProvider.ExternalSystemPriority
-               ? externalId
+               ? task.ExternalFullId
                : task.TA_Id.ToString();
             var secondaryId = settingsProvider.ExternalSystemPriority
                ? task.TA_Id.ToString()
-               : externalId;
+               : task.ExternalFullId;
 
             table.AddRow(
                primaryId,
@@ -48,7 +49,7 @@ namespace App.Commands.Tasks.Common
                task.TA_Title,
                task.PlannedTimeInHours > 0 ? task.PlannedTimeInHours.ToString("0.00") : "-",
                task.SpentTimeInHours > 0 ? task.SpentTimeInHours.ToString("0.00") : "-",
-               task.TA_Closed ? "" : "[green]X[/]"
+               task.TA_Closed ? Icons.CHECK_PRIMARY : Icons.CLOCK_SECONDARY
             );
          }
 
@@ -75,16 +76,32 @@ namespace App.Commands.Tasks.Common
          console.Write(grid);
       }
 
-      public static Task? GetOrChoose(int? taskId = null, IEnumerable<Task>? tasks = null)
+      public static Task? Choose(IEnumerable<Task>? tasks = null)
       {
          var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
-
-         if (taskId is null || taskId <= 0)
-         {
-            return (tasks ?? dbRepository.Tasks.GetActive())
+         return (tasks ?? dbRepository.Tasks.GetActive())
                .ChooseOne("Choose task", 20, (task) => task.GetOptionLabel());
+      }
+
+      public static Task? GetOrChoose(UniversalTaskId? universalTaskId, IEnumerable<Task>? tasks = null)
+      {
+         if (universalTaskId is null || universalTaskId.TaskId is null || universalTaskId.TaskId <= 0)
+         {
+            return Choose(tasks);
          }
 
+         var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
+         return dbRepository.Tasks.Get(universalTaskId);
+      }
+
+      public static Task? GetOrChoose(int? taskId = null, IEnumerable<Task>? tasks = null)
+      {
+         if (taskId is null || taskId <= 0)
+         {
+            return Choose(tasks);
+         }
+
+         var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
          return dbRepository.Tasks.Get(taskId.Value);
       }
 
@@ -170,11 +187,15 @@ namespace App.Commands.Tasks.Common
 
       public static void ValidateModel(Task task)
       {
+         var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
+
          if (task.TA_Title.IsNullOrEmpty()) throw new Exception("Title is empty");
          if (task.TA_RelProjectId <= 0) throw new ArgumentOutOfRangeException("Project id out of range");
          if (task.TA_PlannedTime < 0) throw new ArgumentOutOfRangeException("Planned time less then 0");
-         // TODO: Add validationt of External system type if not null
-         // TODO: Validate that external task id is unique in scope of external system
+         if (task.TA_ExternalSystemType is not null && task.TA_ExternalSystemTaskId is null) throw new ArgumentException("External system was provided withoud external task id");
+         if (task.TA_ExternalSystemType is not null
+            && dbRepository.Tasks.ExternalTaskIdExists(task.TA_ExternalSystemType.Value, task.TA_ExternalSystemTaskId!, task.TA_Id))
+            throw new ArgumentException($"Task with external id {task.TA_ExternalSystemTaskId} in system {task.TA_ExternalSystemType} already exists");
       }
    }
 }

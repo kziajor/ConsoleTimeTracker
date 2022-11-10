@@ -56,8 +56,8 @@ public class TaskEditCommand : Command
    private void EditTaskHandler(TaskInput input)
    {
       Task? task = input.InteractiveMode
-         ? TaskCommon.GetOrChoose(input.Id)
-         : _dbRepository.Tasks.Get(input.Id);
+         ? TaskCommon.GetOrChoose(input.UniversalTaskId)
+         : _dbRepository.Tasks.Get(input.UniversalTaskId);
 
       if (task is null)
       {

@@ -1,5 +1,6 @@
 ﻿using App.Commands.Tasks.Common;
 using App.Extensions;
+using App.Models.Dtos;
 using App.Repositories;
 
 using Spectre.Console;
@@ -25,18 +26,20 @@ public class TaskDetailsCommand : Command
       Add(idArgument);
       Add(interactiveModeOption);
 
-      this.SetHandler((taskId, interactiveMode) => ShowTaskHandler(taskId, interactiveMode), idArgument, interactiveModeOption);
+      this.SetHandler((taskId, interactiveMode) => ShowTaskHandler(_dbRepository, _console, taskId, interactiveMode), idArgument, interactiveModeOption);
    }
 
-   private void ShowTaskHandler(int taskId, bool interactiveMode)
+   internal static void ShowTaskHandler(IDbRepository dbRepository, IAnsiConsole console, string? taskId, bool interactiveMode)
    {
+      var universalTaskId = UniversalTaskId.Create(taskId);
+
       Task? task = interactiveMode
-         ? TaskCommon.GetOrChoose(taskId)
-         : _dbRepository.Tasks.Get(taskId);
+         ? TaskCommon.GetOrChoose(universalTaskId)
+         : dbRepository.Tasks.Get(universalTaskId);
 
       if (task is null)
       {
-         _console.WriteError($"Task with id {taskId} not found");
+         console.WriteError($"Task with id {universalTaskId} not found");
          return;
       }
 

@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using App.Assets;
+using Spectre.Console;
 
 using Task = App.Entities.Task;
 
@@ -6,15 +7,15 @@ namespace App.Commands.Tasks.Common;
 
 public static class TaskExtensions
 {
-   public static string GetOptionLabel(this Task task)
+   public static string GetOptionLabel(this Task task, bool asDefault = false, bool externalSystemPriority = false)
    {
-      var activityLabel = task.TA_Closed ? "not active" : "active";
-      var projectPostfix = $"[{task.Project?.PR_Name ?? string.Empty}]";
-      return $"{task.TA_Id}\t{task.TA_Title}\t({activityLabel}){projectPostfix.EscapeMarkup()}";
-   }
+      var activityIcon = task.TA_Closed ? Icons.CHECK_PRIMARY : Icons.CLOCK_SECONDARY;
+      var projectLabel = $"[{task.Project?.PR_Name ?? string.Empty}]".EscapeMarkup();
+      var taskId = (externalSystemPriority ? $"{task.ExternalFullId} ({task.TA_Id})" : $"{task.TA_Id} ({task.ExternalFullId})").PadRight(20, ' ');
+      var isDefaultIcon = asDefault ? "*" : " ";
 
-   public static string GetScopedExternalId(this Task task)
-   {
-      return $"{task.TA_ExternalSystemType} - {task.TA_ExternalSystemTaskId}";
+      var result = Emoji.Replace($"{isDefaultIcon}{activityIcon} {taskId}\t{task.TA_Title} {projectLabel}");
+
+      return asDefault ? $"[{Colors.PRIMARY}]{result}[/]" : result;
    }
 }

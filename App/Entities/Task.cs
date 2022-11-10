@@ -15,5 +15,6 @@ public sealed class Task
 
    public Project? Project { get; set; }
    public decimal PlannedTimeInHours { get => Math.Round((decimal)TA_PlannedTime / 60, 2); set => TA_PlannedTime = (int)(value * 60); }
-   public decimal SpentTimeInHours { get => Math.Round((decimal)TA_SpentTime / 60, 2); }
+   public decimal SpentTimeInHours => Math.Round((decimal)TA_SpentTime / 60, 2);
+   public string ExternalFullId => TA_ExternalSystemType is not null ? $"{TA_ExternalSystemType}-{TA_ExternalSystemTaskId}" : string.Empty;
 }
