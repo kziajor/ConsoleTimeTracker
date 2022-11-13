@@ -61,7 +61,7 @@ static class Program
       rootCommand.Add(new RecordCommand());
    }
 
-   private static void DisplayTitle(IAnsiConsole console, ISettingsProvider settingsProvider)
+   internal static void DisplayTitle(IAnsiConsole console, ISettingsProvider settingsProvider)
    {
       console.WriteLine();
       if (settingsProvider.DisplayLargeAppName)
