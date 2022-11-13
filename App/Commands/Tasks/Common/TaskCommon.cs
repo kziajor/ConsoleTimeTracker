@@ -49,7 +49,7 @@ namespace App.Commands.Tasks.Common
                task.TA_Title,
                task.PlannedTimeInHours > 0 ? task.PlannedTimeInHours.ToString("0.00") : "-",
                task.SpentTimeInHours > 0 ? task.SpentTimeInHours.ToString("0.00") : "-",
-               task.TA_Closed ? Icons.CHECK_PRIMARY : Icons.CLOCK_SECONDARY
+               task.TA_Closed ? Icons.CHECK : Icons.CLOCK
             );
          }
 
