@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using App.Assets;
+using Spectre.Console;
 
 namespace App.Extensions;
 
@@ -25,7 +26,7 @@ public static class AnsiConsoleExtensions
       Environment.Exit(errorCode);
    }
 
-   public static Grid AddKeyValueRow<T>(this Grid grid, string key, T? value)
+   public static Grid AddKeyValueRow<T>(this Grid grid, string key, T? value, Color? valueColor = null)
    {
       var valueString = value is not null
          ? value switch
@@ -38,7 +39,7 @@ public static class AnsiConsoleExtensions
       grid.AddRow(new Text[]
       {
          new Text($"{key}:", new Style(Color.White)).RightAligned(),
-         new Text(valueString, new Style(Color.Green)).LeftAligned(),
+         new Text(valueString, new Style(valueColor ?? Colors.Primary)).LeftAligned(),
       });
 
       return grid;
