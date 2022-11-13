@@ -1,4 +1,4 @@
-﻿using App.Repositories;
+using App.Repositories;
 
 using System.CommandLine;
 
@@ -27,6 +27,6 @@ public class RecordCommand : Command
    {
       var records = _dbRepository.Records.GetAll();
 
-      RecordCommon.DisplayRecordsList(records);
+      RecordCommon.DisplayList(records);
    }
 }

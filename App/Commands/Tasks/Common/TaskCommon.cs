@@ -57,8 +57,10 @@ namespace App.Commands.Tasks.Common
          AnsiConsole.Write(table);
       }
 
-      public static void ShowTaskDetails(Task task)
+      public static void ShowTaskDetails(Task? task)
       {
+         if (task is null) { return; }
+
          var console = ServicesProvider.GetInstance<IAnsiConsole>();
          var grid = new Grid()
             .AddColumn()

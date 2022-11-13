@@ -1,4 +1,4 @@
-﻿using App.Commands.Records.Common;
+using App.Commands.Records.Common;
 using App.Entities;
 using App.Extensions;
 using App.Repositories;
@@ -39,6 +39,6 @@ public class RecordDetailsCommand : Command
          return;
       }
 
-      RecordCommon.ShowDetails(record);
+      RecordCommon.DisplayDetails(record);
    }
 }

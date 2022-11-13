@@ -9,7 +9,7 @@ public interface IRecordsRepository
 {
    Record? Insert(Record record);
    bool Update(Record record);
-   Record? Get(int id);
+   Record? Get(int? id);
    IEnumerable<Record> GetAll(uint limit = 100, uint skip = 0, string orderBy = "RE_StartedAt DESC");
    IEnumerable<Record> GetInProgress(string orderBy = "RE_StartedAt DESC");
 }
@@ -68,8 +68,10 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
       return Query(connection => connection.Execute(UpdateQuery, record)) == 1;
    }
 
-   public Record? Get(int id)
+   public Record? Get(int? id)
    {
+      if (id is null) { return null; }
+
       return Query((connection) => connection.Query<Record, Task, Project, Record>(GetByIdQuery, (record, task, project) =>
       {
          task.Project = project;

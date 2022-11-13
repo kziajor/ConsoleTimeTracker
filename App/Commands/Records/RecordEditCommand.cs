@@ -61,7 +61,7 @@ public class RecordEditCommand : Command
       {
          var recordsInProgress = _dbRepository.Records.GetInProgress().ToList();
 
-         RecordCommon.DisplayRecordsList(recordsInProgress, "Records in progres");
+         RecordCommon.DisplayList(recordsInProgress, "Records in progres");
          _console.WriteLine();
 
          var record = input.InteractiveMode
@@ -99,6 +99,6 @@ public class RecordEditCommand : Command
 
       _console.MarkupLine("[green]Record updated successfully[/]");
       _console.WriteLine();
-      RecordCommon.DisplayRecordsList(_dbRepository.Records.GetAll(), "Records");
+      RecordCommon.DisplayList(_dbRepository.Records.GetAll(), "Records");
    }
 }

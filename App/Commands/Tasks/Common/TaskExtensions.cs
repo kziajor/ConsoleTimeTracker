@@ -1,4 +1,4 @@
-using App.Assets;
+﻿using App.Assets;
 using Spectre.Console;
 
 using Task = App.Entities.Task;

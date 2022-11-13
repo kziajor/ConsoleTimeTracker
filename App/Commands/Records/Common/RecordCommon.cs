@@ -13,7 +13,7 @@ namespace App.Commands.Records
 {
    public static class RecordCommon
    {
-      public static void DisplayRecordsList(IEnumerable<Record> records, string header = "Records")
+      public static void DisplayList(IEnumerable<Record> records, string header = "Records")
       {
          var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
          var table = new Table();
@@ -174,7 +174,7 @@ namespace App.Commands.Records
             : 0;
       }
 
-      public static void ShowDetails(Record record)
+      public static void DisplayDetails(Record record)
       {
          var grid = new Grid()
             .AddColumn()

@@ -15,11 +15,12 @@ public interface ITasksRepository
 {
    Task? Insert(Task task);
    bool Update(Task task);
-   Task? Get(int id);
+   Task? Get(int? id);
    Task? Get(UniversalTaskId? id);
    IEnumerable<Task> GetAll(string orderBy = "TA_Id DESC");
    IEnumerable<Task> GetClosed(string orderBy = "TA_Id DESC");
    IEnumerable<Task> GetActive(string orderBy = "TA_Id DESC");
+   int GetSpentTimeInMinutes(int? id);
    IEnumerable<Task> GetFiltered(TaskFilters filters);
    bool ExternalTaskIdExists(ExternalSystemEnum externalSystemType, string externalSystemTaskId, int excludedTaskId = -1);
 }
@@ -64,6 +65,7 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
    private static string GetByUniversalIdQuery => string.Format(GetAllQuery, "WHERE TA_Id = @TaskId OR (TA_ExternalSystemType = @ExternalSystemType AND TA_ExternalSystemTaskId = @ExternalSystemTaskId)");
    private static string GetActiveQuery => string.Format(GetAllQuery, "WHERE TA_Closed <= 0");
    private static string GetClosedQuery => string.Format(GetAllQuery, "WHERE TA_Closed >= 1");
+   private static string GetSpentTimeInMinutesQuery => "SELECT sum(RE_MinutesSpent) as 'TA_SpentTime' FROM Records WHERE RE_RelTaskId = @TaskId";
 
    #endregion
 
@@ -85,8 +87,10 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
       return Query(connection => connection.Execute(UpdateQuery, task)) == 1;
    }
 
-   public Task? Get(int id)
+   public Task? Get(int? id)
    {
+      if (id is null) { return null; }
+
       return Query((connection) => connection.Query<Task, Project, Task>(GetByIdQuery, (task, project) =>
       {
          task.Project = project;
@@ -123,6 +127,13 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
       }
 
       return result.SingleOrDefault(t => t.TA_Id == id.TaskId) ?? result[0];
+   }
+
+   public int GetSpentTimeInMinutes(int? id)
+   {
+      if (id is null) { return 0; }
+
+      return Query(connection => connection.ExecuteScalar<int>(GetSpentTimeInMinutesQuery, new { TaskId = id.Value }));
    }
 
    public IEnumerable<Task> GetAll(string orderBy = "TA_Id DESC")
