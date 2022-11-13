@@ -1,4 +1,5 @@
-﻿using App.Entities;
+﻿using App.Commands.Records.Common;
+using App.Entities;
 using App.Extensions;
 using Dapper;
 using Task = App.Entities.Task;
@@ -54,6 +55,7 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
 
    public Record? Insert(Record record)
    {
+      record.RE_MinutesSpent = record.CalculateMinutesSpent();
       var result = Query((connection) => connection.ExecuteScalar<int>(InsertQuery, record));
 
       if (result == 0) { return null; }
@@ -65,6 +67,7 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
 
    public bool Update(Record record)
    {
+      record.RE_MinutesSpent = record.CalculateMinutesSpent();
       return Query(connection => connection.Execute(UpdateQuery, record)) == 1;
    }
 

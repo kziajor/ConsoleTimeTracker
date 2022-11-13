@@ -72,9 +72,7 @@ namespace App.Commands.Records
             RE_Comment = input.Comment ?? CommandCommon.AskForWithEmptyAllowed<string?>("Comment"),
          };
 
-         result.RE_MinutesSpent = result.RE_FinishedAt is not null
-            ? (int)result.RE_FinishedAt.Value.Subtract(result.RE_StartedAt).TotalMinutes
-            : 0;
+         result.RE_MinutesSpent = result.CalculateMinutesSpent();
 
          return result;
       }
@@ -96,9 +94,7 @@ namespace App.Commands.Records
             RE_Comment = input.Comment,
          };
 
-         result.RE_MinutesSpent = result.RE_FinishedAt is not null
-            ? (int)result.RE_FinishedAt.Value.Subtract(result.RE_StartedAt).TotalMinutes
-            : 0;
+         result.RE_MinutesSpent = result.CalculateMinutesSpent();
 
          return result;
       }
@@ -146,7 +142,7 @@ namespace App.Commands.Records
          record.RE_FinishedAt = input.ClearFinishedAt
             ? null
             : input.FinishedAt ?? CommandCommon.AskForWithEmptyAllowed("Finished at", record.RE_FinishedAt);
-         record.RE_MinutesSpent = record.RE_FinishedAt is not null ? (int)record.RE_FinishedAt.Value.Subtract(record.RE_StartedAt).TotalMinutes : 0;
+         record.RE_MinutesSpent = record.CalculateMinutesSpent();
          record.RE_Comment = input.ClearComment
             ? null
             : input.Comment ?? CommandCommon.AskForWithEmptyAllowed<string?>("Comment", record.RE_Comment);
@@ -168,10 +164,7 @@ namespace App.Commands.Records
          record.RE_StartedAt = input.StartedAt ?? record.RE_StartedAt;
          record.RE_FinishedAt = input.FinishedAt ?? record.RE_FinishedAt;
          record.RE_Comment = input.Comment ?? record.RE_Comment;
-
-         record.RE_MinutesSpent = record.RE_FinishedAt is not null
-            ? (int)record.RE_FinishedAt.Value.Subtract(record.RE_StartedAt).TotalMinutes
-            : 0;
+         record.RE_MinutesSpent = record.CalculateMinutesSpent();
       }
 
       public static void DisplayDetails(Record record)
