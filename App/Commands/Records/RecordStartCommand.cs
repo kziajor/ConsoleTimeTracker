@@ -88,9 +88,10 @@ public sealed class RecordStartCommand : Command
       var taskId = _settingsProvider.ExternalSystemPriority
          ? $"{record.Task?.ExternalFullId} ({record.RE_RelTaskId})"
          : $"{record.RE_RelTaskId} ({record.Task?.ExternalFullId})";
-      var taskLabel = $"{taskId} [{record.Task?.Project?.PR_Name}]".EscapeMarkup();
       var topGrid = new Grid().AddColumn().AddColumn()
-         .AddKeyValueRow("Task", taskLabel)
+         .AddKeyValueRow("Task id", taskId)
+         .AddKeyValueRow("Task title", record.Task?.TA_Title)
+         .AddKeyValueRow("Project name", record.Task?.Project?.PR_Name)
          .AddKeyValueRow("Started at", record.RE_StartedAt.ToIsoString());
 
       while (continueCounting)
