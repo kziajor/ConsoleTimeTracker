@@ -17,8 +17,6 @@ public class ProjectEditCommand : Command
 
    public ProjectEditCommand() : base("edit", "Edit project")
    {
-      AddAlias("e");
-
       var idArgument = ProjectArguments.GetIdArgument();
       var nameOption = ProjectOptions.GetNameOption();
       var closedOption = ProjectOptions.GetClosedOption();

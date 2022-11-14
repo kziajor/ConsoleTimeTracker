@@ -17,8 +17,6 @@ public class RecordAddCommand : Command
 
    public RecordAddCommand() : base("add", "Add new record")
    {
-      AddAlias("a");
-
       var taskIdArgument = TaskArguments.GetIdArgument();
       var startedAtOption = RecordOptions.GetStartedAtOption();
       var finishedAtOption = RecordOptions.GetFinishedAtOption();

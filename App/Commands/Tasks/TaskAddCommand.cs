@@ -16,8 +16,6 @@ namespace App.Commands.Tasks
 
       public TaskAddCommand() : base("add", "Add new task")
       {
-         AddAlias("a");
-
          var titleOption = TaskOptions.GetTitleOption();
          var projectIdOption = TaskOptions.GetProjectIdOption();
          var plannedTimeOption = TaskOptions.GetPlannedTimeOption();

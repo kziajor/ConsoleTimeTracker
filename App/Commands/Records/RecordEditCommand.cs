@@ -16,8 +16,6 @@ public class RecordEditCommand : Command
 
    public RecordEditCommand() : base("edit", "Edit record")
    {
-      AddAlias("e");
-
       var idArgument = RecordArguments.GetIdArgument();
       var taskIdOption = RecordOptions.GetTaskIdOption();
       var startedAtOption = RecordOptions.GetStartedAtOption();

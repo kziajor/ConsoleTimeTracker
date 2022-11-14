@@ -18,8 +18,6 @@ public sealed class RecordStartCommand : Command
 
    public RecordStartCommand() : base("start", "Start recording time in live")
    {
-      AddAlias("s");
-
       var taskIdArgument = TaskArguments.GetIdArgument();
       var interactiveMode = CommonOptions.GetInteractiveModeOption();
 

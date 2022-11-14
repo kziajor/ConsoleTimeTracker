@@ -17,8 +17,6 @@ namespace App.Commands.Projects
 
       public ProjectAddCommand() : base("add", "Add new project")
       {
-         AddAlias("a");
-
          var nameOption = ProjectOptions.GetNameOption();
          var closedOption = ProjectOptions.GetClosedOption();
          var interactiveMode = CommonOptions.GetInteractiveModeOption();

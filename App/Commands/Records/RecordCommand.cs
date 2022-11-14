@@ -10,8 +10,6 @@ public class RecordCommand : Command
 
    public RecordCommand() : base("record", "Manage time tracker records")
    {
-      AddAlias("r");
-
       Add(new RecordAddCommand());
       Add(new RecordEditCommand());
       Add(new RecordDetailsCommand());

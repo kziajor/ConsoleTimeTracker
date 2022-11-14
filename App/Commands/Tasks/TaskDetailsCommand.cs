@@ -18,8 +18,6 @@ public class TaskDetailsCommand : Command
 
    public TaskDetailsCommand() : base("details", "Show task details")
    {
-      AddAlias("d");
-
       var idArgument = TaskArguments.GetIdArgument();
       var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
 

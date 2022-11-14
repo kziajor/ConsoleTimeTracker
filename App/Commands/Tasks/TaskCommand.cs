@@ -13,8 +13,6 @@ public class TaskCommand : Command
 
    public TaskCommand() : base("task", "Manage tasks")
    {
-      AddAlias("t");
-
       Add(new TaskAddCommand());
       Add(new TaskEditCommand());
       Add(new TaskDetailsCommand());

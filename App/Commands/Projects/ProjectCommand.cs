@@ -11,8 +11,6 @@ namespace App.Commands.Projects
 
       public ProjectCommand() : base("project", "Manage projects")
       {
-         AddAlias("p");
-
          Add(new ProjectAddCommand());
          Add(new ProjectEditCommand());
          Add(new ProjectDetailsCommand());

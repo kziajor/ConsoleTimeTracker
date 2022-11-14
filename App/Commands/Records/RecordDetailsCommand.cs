@@ -14,10 +14,8 @@ public class RecordDetailsCommand : Command
    private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
    private readonly IAnsiConsole _console = ServicesProvider.GetInstance<IAnsiConsole>();
 
-   public RecordDetailsCommand() : base("details", "Display record details")
+   public RecordDetailsCommand() : base("show", "Display record details")
    {
-      AddAlias("d");
-
       var idArgument = RecordArguments.GetIdArgument();
       var interactiveMode = CommonOptions.GetInteractiveModeOption();
 

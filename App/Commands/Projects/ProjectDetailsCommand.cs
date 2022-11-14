@@ -15,8 +15,6 @@ public class ProjectDetailsCommand : Command
 
    public ProjectDetailsCommand() : base("details", "Show project details")
    {
-      AddAlias("d");
-
       var idArgument = ProjectArguments.GetIdArgument();
       var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
 

@@ -18,8 +18,6 @@ public class TaskEditCommand : Command
 
    public TaskEditCommand() : base("edit", "Edit task")
    {
-      AddAlias("e");
-
       var idArgument = TaskArguments.GetIdArgument();
       var titleOption = TaskOptions.GetTitleOption();
       var projectIdOption = TaskOptions.GetProjectIdOption();
