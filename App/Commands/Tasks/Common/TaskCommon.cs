@@ -126,7 +126,7 @@ namespace App.Commands.Tasks.Common
                ?.PR_Id ?? 0,
             PlannedTimeInHours = input.PlannedTime ?? CommandCommon.AskFor<decimal>("Planned time (H)"),
             TA_Closed = input.Closed ?? console.Confirm("Task closed", false),
-            TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed<ExternalSystemEnum?>("External system", settingsProvider.ExternalSystemPriority ? settingsProvider.ExternalSystemDefaultType : null),
+            TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed<ExternalSystemEnum?>("External system", settingsProvider.ExternalSystemPriority ? settingsProvider.ExternalSystemDefaultType : null), // TODO: Change to list of enums with option to set empty value
          };
 
          if (result.TA_ExternalSystemType is not null)
@@ -169,7 +169,7 @@ namespace App.Commands.Tasks.Common
 
          task.TA_Closed = input.Closed ?? console.Confirm("Task closed", task.TA_Closed);
          task.PlannedTimeInHours = input.PlannedTime ?? CommandCommon.AskForWithEmptyAllowed<decimal?>("Planned time", task.PlannedTimeInHours) ?? task.PlannedTimeInHours;
-         task.TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed<ExternalSystemEnum?>("External system", task.TA_ExternalSystemType);
+         task.TA_ExternalSystemType = input.ExternalSystemType ?? CommandCommon.AskForWithEmptyAllowed<ExternalSystemEnum?>("External system", task.TA_ExternalSystemType); // TODO: Change to list of enums with option to set empty value
 
          if (task.TA_ExternalSystemType is not null)
          {

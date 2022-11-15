@@ -10,7 +10,7 @@ public sealed class Task
    public bool TA_Closed { get; set; }
    public int TA_SpentTime { get; set; }
    public int TA_RelProjectId { get; set; }
-   public ExternalSystemEnum? TA_ExternalSystemType { get; set; }
+   public ExternalSystemEnum? TA_ExternalSystemType { get; set; } // TODO: change to not null in database and set default value to 0
    public string? TA_ExternalSystemTaskId { get; set; }
 
    public Project? Project { get; set; }
