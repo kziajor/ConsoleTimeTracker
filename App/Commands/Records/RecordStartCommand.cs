@@ -5,7 +5,9 @@ using App.Entities;
 using App.Extensions;
 using App.Models.Dtos;
 using App.Repositories;
+
 using Spectre.Console;
+
 using System.CommandLine;
 
 namespace App.Commands.Records;
@@ -33,6 +35,7 @@ public sealed class RecordStartCommand : Command
       var universalTaskId = UniversalTaskId.Create(taskIdArgument);
       Record? recordToStart;
 
+      // FIX: App returns error when user provide id off task that is currently in progress
       if (recordsInProgress.Count > 0 && universalTaskId is not null)
       {
          RecordCommon.DisplayList(recordsInProgress, "Records in progres");
@@ -73,6 +76,8 @@ public sealed class RecordStartCommand : Command
       }
 
       if (recordToStart.RE_Id <= 0) { return; }
+
+      recordToStart.Task = _dbRepository.Tasks.Get(recordToStart.RE_RelTaskId);
 
       DisplayTimer(recordToStart);
    }
