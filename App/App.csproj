@@ -1,20 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+   <PropertyGroup>
+      <OutputType>Exe</OutputType>
+      <TargetFramework>net6.0</TargetFramework>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
+      <AssemblyName>consolett</AssemblyName>
 
-  <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="dbup-sqlite" Version="4.6.0" />
-    <PackageReference Include="Terminal.Gui" Version="1.8.2" />
-  </ItemGroup>
+      <PackageVersion>0.1.0-alpha</PackageVersion>
+      <PackageId>consolett</PackageId>
+      <PackAsTool>true</PackAsTool>
+      <ToolCommandName>tt</ToolCommandName>
+      <PackageTags>console timesheet time tracker</PackageTags>
+      <PackageOutputPath>../Package</PackageOutputPath>
+   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\MigrationScripts\" />
-  </ItemGroup>
+   <ItemGroup>
+      <PackageReference Include="Dapper" Version="2.0.123" />
+      <PackageReference Include="dbup-sqlite" Version="4.6.0" />
+      <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="6.0.10" />
+      <PackageReference Include="Spectre.Console" Version="0.45.0" />
+      <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+      <PackageReference Include="Terminal.Gui" Version="1.8.2" />
+      <PackageReference Include="SQLitePCLRaw.core" Version="2.1.2" />
+      <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.2" />
+   </ItemGroup>
 
 </Project>

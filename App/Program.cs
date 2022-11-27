@@ -1,33 +1,102 @@
-﻿using Terminal.Gui;
+﻿using App.Commands.Projects;
+using App.Commands.Records;
+using App.Commands.Tasks;
+using App.Migrations;
+using App.Repositories;
 
-Application.Init();
-var window = new Window("TimeSheet - Ctrl-Q to quit")
+using Spectre.Console;
+
+using System.CommandLine;
+
+namespace App;
+
+static class Program
 {
-   X = 0,
-   Y = 0,
-   Width = Dim.Fill(),
-   Height = Dim.Fill(),
-};
-
-Application.Top.Add(window);
-
-var messageButton = new Button(1, 1, "Message");
-var closeButton = new Button(12, 1, "Close", true);
-
-messageButton.Clicked += () =>
-{
-   var n = MessageBox.Query(50, 7,
-            "Question", "Do you want to exit?", "Yes", "No");
-
-   if (n == 0)
+   static async Task<int> Main(string[] args)
    {
-      Environment.Exit(0);
+      System.Console.OutputEncoding = System.Text.Encoding.UTF8; // FIX for displaing emoji icons
+      RegisterServices();
+
+      var console = ServicesProvider.GetInstance<IAnsiConsole>();
+      var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
+
+      if (settingsProvider.ClearConsoleAfterEveryCommand) { console.Clear(); }
+
+      DisplayHeader(console, settingsProvider);
+      EnsureDbDataDirectoryExists(settingsProvider.DbFile);
+      DbMigrator.Migrate(settingsProvider.ConnectionString);
+
+      var rootCommand = new RootCommand("Console Time Tracker")
+      {
+         Name = "TT",
+      };
+
+      RegisterCommands(rootCommand);
+
+      console.WriteLine();
+
+      var result = await rootCommand.InvokeAsync(args);
+
+      console.WriteLine();
+      console.Write(new Rule().RuleStyle("green"));
+
+      return result;
    }
-};
 
-closeButton.Clicked += () => Environment.Exit(0);
+   private static void RegisterServices()
+   {
+      var settingsProvider = new SettingsProvider();
+      var dbRepository = new DbRepository(settingsProvider.ConnectionString);
 
-window.Add(messageButton);
-window.Add(closeButton);
+      ServicesProvider.Register<IAnsiConsole, object>(AnsiConsole.Console);
+      ServicesProvider.Register<ISettingsProvider, SettingsProvider>(settingsProvider);
+      ServicesProvider.Register<IDbRepository, DbRepository>(dbRepository);
+   }
 
-Application.Run();
+   private static void RegisterCommands(RootCommand rootCommand)
+   {
+      rootCommand.Add(new ProjectCommand());
+      rootCommand.Add(new TaskCommand());
+      rootCommand.Add(new RecordCommand());
+   }
+
+   internal static void DisplayHeader(IAnsiConsole console, ISettingsProvider settingsProvider)
+   {
+      console.WriteLine();
+      if (settingsProvider.DisplayLargeAppName)
+      {
+         console.Write(new Rule().RuleStyle("green"));
+         console.Write(new FigletText("ConsoleTT").Color(Color.Green));
+         ShowBasicInfo(console, settingsProvider);
+      }
+      else
+      {
+         var rule = new Rule($"[green]ConsoleTT    ({settingsProvider.DbFile.FullName})[/]")
+            .LeftAligned()
+            .RuleStyle("green");
+
+         console.Write(rule);
+         console.WriteLine();
+      }
+   }
+
+   private static void EnsureDbDataDirectoryExists(FileInfo dbDataFile)
+   {
+      if (dbDataFile.Directory is null)
+      {
+         throw new ArgumentException($"Data directory error for path: {dbDataFile.FullName}");
+      }
+
+      if (!dbDataFile.Directory.Exists)
+      {
+         Directory.CreateDirectory(dbDataFile.Directory.FullName);
+      }
+   }
+
+   private static void ShowBasicInfo(IAnsiConsole console, ISettingsProvider settingsProvider)
+   {
+      console.WriteLine();
+      console.MarkupLine($"Database file: [green]{settingsProvider.DbFile.FullName}[/]");
+      console.WriteLine();
+   }
+}
