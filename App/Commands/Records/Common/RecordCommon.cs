@@ -1,4 +1,4 @@
-﻿using App.Commands.Records.Common;
+using App.Commands.Records.Common;
 using App.Commands.Tasks.Common;
 using App.Entities;
 using App.Extensions;
@@ -11,6 +11,9 @@ namespace App.Commands.Records
 {
     public static class RecordCommon
     {
+      private static readonly IAnsiConsole _console = ServicesProvider.GetInstance<IAnsiConsole>();
+      private static readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
+
         public static void DisplayList(IEnumerable<Record> records, string header = "Records")
         {
             var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
@@ -41,22 +44,21 @@ namespace App.Commands.Records
                 );
             }
 
-            AnsiConsole.MarkupLineInterpolated($"[green]{header}[/]");
-            AnsiConsole.Write(table);
+         _console.MarkupLineInterpolated($"[green]{header}[/]");
+         _console.Write(table);
         }
 
         public static Record CreateNewRecordInteractive(RecordInput input)
         {
             if (input is null) throw new Exception("Wrong input data");
 
-            var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
             var taskId = input.UniversalTaskId?.IsInternal == true && input.UniversalTaskId.InternalTaskId > 0
                ? input.UniversalTaskId.InternalTaskId
-               : dbRepository.Tasks.Get(input.UniversalTaskId)?.TA_Id;
+            : _dbRepository.Tasks.Get(input.UniversalTaskId)?.TA_Id;
 
             var result = new Record
             {
-                RE_RelTaskId = taskId ?? dbRepository.Tasks
+            RE_RelTaskId = taskId ?? _dbRepository.Tasks
                   .GetActive()
                   .OrderByDescending(t => t.TA_Id)
                   .ChooseOne(
@@ -77,10 +79,9 @@ namespace App.Commands.Records
         {
             if (input is null) throw new Exception("Wrong input data");
 
-            var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
             var taskId = input.UniversalTaskId?.IsInternal == true && input.UniversalTaskId.InternalTaskId > 0
                ? input.UniversalTaskId.InternalTaskId
-               : dbRepository.Tasks.Get(input.UniversalTaskId)?.TA_Id;
+            : _dbRepository.Tasks.Get(input.UniversalTaskId)?.TA_Id;
 
             var result = new Record
             {
@@ -104,30 +105,27 @@ namespace App.Commands.Records
 
         public static Record? GetOrChoose(int? recordId = null, IEnumerable<Record>? records = null)
         {
-            var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
-
             if (recordId is null || recordId <= 0)
             {
-                return (records ?? dbRepository.Records.GetAll())
+            return (records ?? _dbRepository.Records.GetAll())
                    .ChooseOne("Choose record", 20, optionNameConverter: (record) => record.GetOptionLabel());
             }
 
-            return dbRepository.Records.Get(recordId.Value);
+         return _dbRepository.Records.Get(recordId.Value);
         }
 
         public static void UpdateRecordDataInteractive(Record record, RecordInput input)
         {
             if (input is null) throw new Exception("Wrong input data");
 
-            var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
             var taskId = input.UniversalTaskId?.IsInternal == true && input.UniversalTaskId.InternalTaskId > 0
                ? input.UniversalTaskId.InternalTaskId
-               : dbRepository
+            : _dbRepository
                   .Tasks
                   .Get(input.UniversalTaskId)
                   ?.TA_Id;
 
-            record.RE_RelTaskId = taskId ?? dbRepository.Tasks
+         record.RE_RelTaskId = taskId ?? _dbRepository.Tasks
                   .GetActive()
                   .OrderBy(t => t.TA_Title)
                   .ToList()
@@ -151,10 +149,9 @@ namespace App.Commands.Records
         {
             if (input is null) throw new Exception("Wrong input data");
 
-            var dbRepository = ServicesProvider.GetInstance<IDbRepository>();
             var taskId = input.UniversalTaskId?.IsInternal == true && input.UniversalTaskId.InternalTaskId > 0
                ? input.UniversalTaskId.InternalTaskId
-               : dbRepository
+            : _dbRepository
                   .Tasks
                   .Get(input.UniversalTaskId)
                   ?.TA_Id;
@@ -182,7 +179,7 @@ namespace App.Commands.Records
                .AddKeyValueRow("Time spent (h)", Math.Round((double)record.RE_MinutesSpent / 60, 2))
                .AddKeyValueRow("Comment", record.RE_Comment);
 
-            AnsiConsole.Write(grid);
+         _console.Write(grid);
         }
     }
 }
