@@ -33,21 +33,38 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
 
    private static readonly string GetAllQuery =
       $@"
-         SELECT {Task.TableName}.*, sum({nameof(Record.RE_MinutesSpent)}) as '{nameof(Task.TA_SpentTime)}', {Project.TableName}.*
+         SELECT
+            {Task.TableName}.*
+            ,sum({nameof(Record.RE_MinutesSpent)}) as '{nameof(Task.TA_SpentTime)}'
+            ,{Project.TableName}.*
          FROM {Task.TableName}
          INNER JOIN {Project.TableName} ON {nameof(Project.PR_Id)} = {nameof(Task.TA_RelProjectId)}
          LEFT JOIN {Record.TableName} ON {nameof(Record.RE_RelTaskId)} = {nameof(Task.TA_Id)}
          {{0}}
          GROUP BY
-          {nameof(Task.TA_Id)}, {nameof(Task.TA_Title)}, {nameof(Task.TA_PlannedTime)}, {nameof(Task.TA_Closed)}, {nameof(Task.TA_RelProjectId)}, {nameof(Task.TA_SourceType)}, {nameof(Task.TA_SourceTaskId)}, {nameof(Project.PR_Id)}, {nameof(Project.PR_Name)}, {nameof(Project.PR_Closed)}
+            {nameof(Task.TA_Id)}, {nameof(Task.TA_Title)}, {nameof(Task.TA_PlannedTime)}, {nameof(Task.TA_Closed)}, {nameof(Task.TA_RelProjectId)}, {nameof(Task.TA_SourceType)}, {nameof(Task.TA_SourceTaskId)}, {nameof(Project.PR_Id)}, {nameof(Project.PR_Name)}, {nameof(Project.PR_Closed)}
       ";
 
    private static readonly string InsertQuery =
       $@"
          INSERT INTO {Task.TableName}
-            ({nameof(Task.TA_Title)}, {nameof(Task.TA_PlannedTime)}, {nameof(Task.TA_Closed)}, {nameof(Task.TA_RelProjectId)}, {nameof(Task.TA_SourceType)}, {nameof(Task.TA_SourceTaskId)})
+         (
+            {nameof(Task.TA_Title)}
+            ,{nameof(Task.TA_PlannedTime)}
+            ,{nameof(Task.TA_Closed)}
+            ,{nameof(Task.TA_RelProjectId)}
+            ,{nameof(Task.TA_SourceType)}
+            ,{nameof(Task.TA_SourceTaskId)}
+         )
          VALUES
-            (@{nameof(Task.TA_Title)}, @{nameof(Task.TA_PlannedTime)}, @{nameof(Task.TA_Closed)}, @{nameof(Task.TA_RelProjectId)}, @{nameof(Task.TA_SourceType)}, @{nameof(Task.TA_SourceTaskId)});
+         (
+            @{nameof(Task.TA_Title)}
+            ,@{nameof(Task.TA_PlannedTime)}
+            ,@{nameof(Task.TA_Closed)}
+            ,@{nameof(Task.TA_RelProjectId)}
+            ,@{nameof(Task.TA_SourceType)}
+            ,@{nameof(Task.TA_SourceTaskId)}
+         );
          SELECT last_insert_rowid();
       ";
 
@@ -66,10 +83,16 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
       ";
 
    private static readonly string CheckExternalIdIsUniqueQuery =
-      $"SELECT count(*) FROM {Task.TableName} WHERE {nameof(Task.TA_SourceType)} = @SourceSystemType AND {nameof(Task.TA_SourceTaskId)} = @SourceSystemTaskId AND {nameof(Task.TA_Id)} <> @ExcludedTaskId";
+      $@"
+         SELECT count(*) FROM {Task.TableName}
+         WHERE
+            {nameof(Task.TA_SourceType)} = @SourceSystemType AND
+            {nameof(Task.TA_SourceTaskId)} = @SourceSystemTaskId AND
+            {nameof(Task.TA_Id)} <> @ExcludedTaskId
+      ";
 
    private static readonly string GetByIdQuery =
-      string.Format(GetAllQuery, $"WHERE {nameof(Task.TA_Id)} = @TA_Id");
+      string.Format(GetAllQuery, $"WHERE {nameof(Task.TA_Id)} = @{nameof(Task.TA_Id)}");
 
    private static readonly string GetBySourceSystemIdQuery =
       string.Format(GetAllQuery, $"WHERE {nameof(Task.TA_SourceType)} <> {(int)SourceSystemType.Internal} AND {nameof(Task.TA_SourceType)} = @SourceSystemType AND {nameof(Task.TA_SourceTaskId)} = @SourceSystemTaskId");
@@ -81,7 +104,11 @@ public sealed class TasksRepository : BaseRepository, ITasksRepository
       string.Format(GetAllQuery, $"WHERE {nameof(Task.TA_Closed)} >= 1");
 
    private static readonly string GetSpentTimeInMinutesQuery =
-      $"SELECT sum({nameof(Record.RE_MinutesSpent)}) as '{nameof(Task.TA_SpentTime)}' FROM {Record.TableName} WHERE {nameof(Record.RE_RelTaskId)} = @TaskId";
+      $@"
+         SELECT sum({nameof(Record.RE_MinutesSpent)}) as '{nameof(Task.TA_SpentTime)}'
+         FROM {Record.TableName}
+         WHERE {nameof(Record.RE_RelTaskId)} = @TaskId
+      ";
 
    #endregion
 

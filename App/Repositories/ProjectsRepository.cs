@@ -6,64 +6,90 @@ namespace App.Repositories;
 
 public interface IProjectsRepository
 {
-    Project? Insert(Project project);
-    bool Update(Project project);
-    Project? Get(int id);
-    IEnumerable<Project> GetAll(string? orderBy = null);
-    IEnumerable<Project> GetClosed(string? orderBy = null);
-    IEnumerable<Project> GetActive(string? orderBy = null);
+   Project? Insert(Project project);
+   bool Update(Project project);
+   Project? Get(int id);
+   IEnumerable<Project> GetAll(string? orderBy = null);
+   IEnumerable<Project> GetClosed(string? orderBy = null);
+   IEnumerable<Project> GetActive(string? orderBy = null);
 }
 
 public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
 {
-    private static readonly string _defaultOrderBy = $"{nameof(Project.PR_Name)} DESC";
+   private static readonly string _defaultOrderBy = $"{nameof(Project.PR_Name)} DESC";
 
-    #region Queries
+   #region Queries
 
-    private const string GetAllQuery = "SELECT * FROM Projects";
-    private const string InsertQuery = "INSERT INTO Projects (PR_Name, PR_Closed) VALUES (@PR_Name, @PR_Closed); SELECT last_insert_rowid();";
-    private const string UpdateQuery = "UPDATE projects SET PR_Name = @PR_Name, PR_Closed = @PR_Closed WHERE PR_Id = @PR_Id";
-    private static string GetByIdQuery => $"{GetAllQuery} WHERE PR_Id = @PR_Id";
-    private static string GetClosedQuery => $"{GetAllQuery} WHERE PR_Closed >= 1";
-    private static string GetActiveQuery => $"{GetAllQuery} WHERE PR_Closed <= 0";
+   private static readonly string GetAllQuery = $"SELECT * FROM {Project.TableName}";
 
-    #endregion
+   private static readonly string InsertQuery =
+      $@"
+         INSERT INTO {Project.TableName}
+         (
+            {nameof(Project.PR_Name)}
+            ,{nameof(Project.PR_Closed)}
+         )
+         VALUES
+         (
+            @{nameof(Project.PR_Name)}
+            ,@{nameof(Project.PR_Closed)}
+         );
+         SELECT last_insert_rowid();
+      ";
 
-    public ProjectsRepository(string connectionString) : base(connectionString) { }
+   private static readonly string UpdateQuery =
+      $@"
+         UPDATE {Project.TableName}
+         SET
+            {nameof(Project.PR_Name)} = @{nameof(Project.PR_Name)}
+            ,{nameof(Project.PR_Closed)} = @{nameof(Project.PR_Closed)}
+         WHERE
+            {nameof(Project.PR_Id)} = @{nameof(Project.PR_Id)}
+      ";
 
-    public Project? Insert(Project project)
-    {
-        var result = Query((connection) => connection.ExecuteScalar<int>(InsertQuery, project));
+   private static readonly string GetByIdQuery = $"{GetAllQuery} WHERE {nameof(Project.PR_Id)} = @{nameof(Project.PR_Id)}";
 
-        if (result == 0) { return null; }
+   private static readonly string GetClosedQuery = $"{GetAllQuery} WHERE {nameof(Project.PR_Closed)} >= 1";
 
-        project.PR_Id = result;
+   private static readonly string GetActiveQuery = $"{GetAllQuery} WHERE {nameof(Project.PR_Closed)} <= 0";
 
-        return project;
-    }
+   #endregion
 
-    public bool Update(Project project)
-    {
-        return Query(connection => connection.Execute(UpdateQuery, project)) == 1;
-    }
+   public ProjectsRepository(string connectionString) : base(connectionString) { }
 
-    public Project? Get(int id)
-    {
-        return Query((connection) => connection.QueryFirstOrDefault<Project?>(GetByIdQuery, new { PR_Id = id }));
-    }
+   public Project? Insert(Project project)
+   {
+      var result = Query((connection) => connection.ExecuteScalar<int>(InsertQuery, project));
 
-    public IEnumerable<Project> GetAll(string? orderBy = null)
-    {
-        return Query((connection) => connection.Query<Project>($"{GetAllQuery} ORDER BY {orderBy ?? _defaultOrderBy}"));
-    }
+      if (result == 0) { return null; }
 
-    public IEnumerable<Project> GetClosed(string? orderBy = null)
-    {
-        return Query((connection) => connection.Query<Project>($"{GetClosedQuery} ORDER BY {orderBy ?? _defaultOrderBy}"));
-    }
+      project.PR_Id = result;
 
-    public IEnumerable<Project> GetActive(string? orderBy = null)
-    {
-        return Query((connection) => connection.Query<Project>($"{GetActiveQuery} ORDER BY {orderBy ?? _defaultOrderBy}"));
-    }
+      return project;
+   }
+
+   public bool Update(Project project)
+   {
+      return Query(connection => connection.Execute(UpdateQuery, project)) == 1;
+   }
+
+   public Project? Get(int id)
+   {
+      return Query((connection) => connection.QueryFirstOrDefault<Project?>(GetByIdQuery, new { PR_Id = id }));
+   }
+
+   public IEnumerable<Project> GetAll(string? orderBy = null)
+   {
+      return Query((connection) => connection.Query<Project>($"{GetAllQuery} ORDER BY {orderBy ?? _defaultOrderBy}"));
+   }
+
+   public IEnumerable<Project> GetClosed(string? orderBy = null)
+   {
+      return Query((connection) => connection.Query<Project>($"{GetClosedQuery} ORDER BY {orderBy ?? _defaultOrderBy}"));
+   }
+
+   public IEnumerable<Project> GetActive(string? orderBy = null)
+   {
+      return Query((connection) => connection.Query<Project>($"{GetActiveQuery} ORDER BY {orderBy ?? _defaultOrderBy}"));
+   }
 }
