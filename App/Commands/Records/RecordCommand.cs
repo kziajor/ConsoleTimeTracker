@@ -1,4 +1,5 @@
-﻿using App.Repositories;
+﻿using App.Commands.Records.Common;
+using App.Repositories;
 
 using System.CommandLine;
 
@@ -10,22 +11,28 @@ public class RecordCommand : Command
 
    public RecordCommand() : base("record", "Manage time tracker records")
    {
+      var dayArgument = RecordArguments.GetDayArgument();
+
+      Add(dayArgument);
+
       Add(new RecordAddCommand());
       Add(new RecordEditCommand());
       Add(new RecordDetailsCommand());
-      Add(new RecordStartCommand());
+      Add(new RecordCountCommand());
 
-      // TODO: Add param displaing records grouped by day and maybe setting
-      // TODO: Setting to set from how many days should be displayed records by default
-      // TODO: Param to set how many days sholud be displayed.
-
-      this.SetHandler(() => RecordListHandle());
+      this.SetHandler(day => RecordListHandle(day), dayArgument);
    }
 
-   private void RecordListHandle()
+   private void RecordListHandle(string? day)
    {
-      var records = _dbRepository.Records.GetAll();
+      DateTime? fromDay = null;
 
-      RecordCommon.DisplayList(records);
+      if (string.IsNullOrEmpty(day)) { fromDay = DateTime.Now; }
+      else if (DateTime.TryParse(day, out DateTime parsedDay)) { fromDay = parsedDay; }
+      else if (int.TryParse(day, out int parsedDayCount)) { fromDay = DateTime.Now.AddDays(parsedDayCount); }
+
+      var records = _dbRepository.Records.GetByDay(fromDay ??= DateTime.Now);
+
+      RecordCommon.DisplayList(records, $"Records - {fromDay.Value:yyyy-MM-dd} ({fromDay.Value.DayOfWeek})");
    }
 }

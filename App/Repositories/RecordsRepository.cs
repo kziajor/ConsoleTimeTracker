@@ -1,5 +1,6 @@
 ﻿using App.Commands.Records.Common;
 using App.Entities;
+using App.Extensions;
 using Dapper;
 using Task = App.Entities.Task;
 
@@ -12,6 +13,7 @@ public interface IRecordsRepository
    Record? Get(int? id);
    IEnumerable<Record> GetAll(uint limit = 100, uint skip = 0, string? orderBy = null);
    IEnumerable<Record> GetInProgress(string? orderBy = null);
+   IEnumerable<Record> GetByDay(DateTime day, string? orderBy = null);
 }
 
 public sealed class RecordsRepository : BaseRepository, IRecordsRepository
@@ -111,6 +113,28 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
       var query = $"{GetAllQuery} ORDER BY {orderBy ?? _defaultOrderBy} LIMIT {limit} OFFSET {skip}";
 
       return Query((connection) => connection.Query<Record, Task, Project, Record>(query, (record, task, project) =>
+      {
+         task.TA_Project = project;
+         record.Task = task;
+
+         return record;
+      },
+      splitOn: "TA_Id, PR_Id"));
+   }
+
+   public IEnumerable<Record> GetByDay(DateTime day, string? orderBy = null)
+   {
+      var dayBeginning = day.Date.ToIsoString();
+      var nextDayBeginning = day.Date.AddDays(1).ToIsoString();
+      var query =
+         $@"
+            {GetAllQuery}
+            WHERE
+               {nameof(Record.RE_StartedAt)} >= '{dayBeginning}' AND {nameof(Record.RE_StartedAt)} < '{nextDayBeginning}'
+            ORDER BY {orderBy ?? _defaultOrderBy}
+         ";
+
+      return Query(connection => connection.Query<Record, Task, Project, Record>(query, (record, task, project) =>
       {
          task.TA_Project = project;
          record.Task = task;

@@ -12,13 +12,13 @@ using System.CommandLine;
 
 namespace App.Commands.Records;
 
-public sealed class RecordStartCommand : Command
+public sealed class RecordCountCommand : Command
 {
    private readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
    private readonly IAnsiConsole _console = ServicesProvider.GetInstance<IAnsiConsole>();
    private readonly ISettingsProvider _settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
 
-   public RecordStartCommand() : base("start", "Start recording time in live")
+   public RecordCountCommand() : base("count", "Start counting time for given task in live")
    {
       var taskIdArgument = TaskArguments.GetIdArgument();
       var manualMode = CommonOptions.GetManualModeOption();
@@ -32,18 +32,18 @@ public sealed class RecordStartCommand : Command
    internal void RecordStartHandler(string? taskIdArgument, bool manualMode)
    {
       var recordsInProgress = _dbRepository.Records.GetInProgress().ToList();
-      var universalTaskId = UniversalTaskId.Create(taskIdArgument);
+      UniversalTaskId universalTaskId = UniversalTaskId.Create(taskIdArgument);
       Record? recordToStart;
 
       // FIX: App returns error when user provide id off task that is currently in progress
-      if (recordsInProgress.Count > 0 && universalTaskId is not null)
+      if (!universalTaskId.IsEmpty && recordsInProgress.Any(rip => rip.RE_Id != universalTaskId.InternalTaskId))
       {
          RecordCommon.DisplayList(recordsInProgress, "Records in progres");
          _console.WriteError("There could be only one record in progres. Finish record that is already in progress.");
          return;
       }
 
-      if (recordsInProgress.Count > 0 && universalTaskId is null)
+      if (recordsInProgress.Count > 0 && universalTaskId.IsEmpty)
       {
          recordToStart = recordsInProgress[0];
       }
@@ -153,13 +153,60 @@ public sealed class RecordStartCommand : Command
 
       if (finishRecordAfterStop)
       {
-         record.RE_FinishedAt = DateTime.Now;
+         var finishedDateTime = DateTime.Now;
+
+         // TODO: Split record to more then two automatically. If record end in different day than it starts, ask user to confirm record finish time.
+         if (finishedDateTime.Subtract(record.RE_StartedAt).TotalDays > 1)
+         {
+            _console.WriteError("This record is too long. Record can be finished only in same day when it was started. You have to manually split it to more records.");
+            _console.WriteLine();
+            RecordCommon.DisplayList(_dbRepository.Records.GetByDay(record.RE_StartedAt.Date));
+            return;
+         }
+
+         record.RE_FinishedAt = finishedDateTime.Date == record.RE_StartedAt.Date
+            ? finishedDateTime
+            : record.RE_StartedAt.Date.AddDays(1).AddMinutes(-1);
          record.RE_MinutesSpent = record.CalculateMinutesSpent();
-         _dbRepository.Records.Update(record);
+
+         try
+         {
+            RecordCommon.ValidateModel(record);
+            _dbRepository.Records.Update(record);
+         }
+         catch (Exception ex)
+         {
+            _console.WriteErrorAndExit(ex.Message);
+         }
 
          _console.Write(new Rule("Record details").RuleStyle("white").Centered());
          _console.WriteLine();
          RecordCommon.DisplayDetails(record);
+
+         if (finishedDateTime.Date != record.RE_StartedAt.Date)
+         {
+            var secondRecord = new Record
+            {
+               RE_RelTaskId = record.RE_RelTaskId,
+               RE_Comment = record.RE_Comment,
+               RE_StartedAt = finishedDateTime.Date,
+               RE_FinishedAt = finishedDateTime,
+            };
+            secondRecord.RE_MinutesSpent = secondRecord.CalculateMinutesSpent();
+
+            try
+            {
+               RecordCommon.ValidateModel(secondRecord);
+               _dbRepository.Records.Insert(secondRecord);
+            }
+            catch (Exception ex)
+            {
+               _console.WriteErrorAndExit(ex.Message);
+            }
+
+            _console.WriteLine();
+            RecordCommon.DisplayDetails(secondRecord);
+         }
 
          _console.WriteLine();
          _console.Write(new Rule("Task details").RuleStyle("white").Centered());
@@ -168,7 +215,7 @@ public sealed class RecordStartCommand : Command
       }
       else
       {
-         RecordCommon.DisplayList(_dbRepository.Records.GetAll());
+         RecordCommon.DisplayList(_dbRepository.Records.GetByDay(record.RE_StartedAt.Date));
       }
    }
 }
