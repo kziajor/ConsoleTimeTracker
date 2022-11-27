@@ -27,7 +27,7 @@ public interface ITasksRepository
 
 public sealed class TasksRepository : BaseRepository, ITasksRepository
 {
-   private static readonly string _defaultOrderBy = $"{nameof(Task.TA_Title)} ASC";
+   private static readonly string _defaultOrderBy = $"{nameof(Project.PR_Name)} DESC, {nameof(Task.TA_Title)} DESC";
 
    #region Queries
 
