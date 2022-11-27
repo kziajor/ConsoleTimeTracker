@@ -22,7 +22,7 @@ static class Program
 
       if (settingsProvider.ClearConsoleAfterEveryCommand) { console.Clear(); }
 
-      DisplayTitle(console, settingsProvider);
+      DisplayHeader(console, settingsProvider);
       EnsureDbDataDirectoryExists(settingsProvider.DbFile);
       DbMigrator.Migrate(settingsProvider.ConnectionString);
 
@@ -33,7 +33,6 @@ static class Program
 
       RegisterCommands(rootCommand);
 
-      ShowBasicInfo(console, settingsProvider);
       console.WriteLine();
 
       var result = await rootCommand.InvokeAsync(args);
@@ -61,17 +60,18 @@ static class Program
       rootCommand.Add(new RecordCommand());
    }
 
-   internal static void DisplayTitle(IAnsiConsole console, ISettingsProvider settingsProvider)
+   internal static void DisplayHeader(IAnsiConsole console, ISettingsProvider settingsProvider)
    {
       console.WriteLine();
       if (settingsProvider.DisplayLargeAppName)
       {
          console.Write(new Rule().RuleStyle("green"));
          console.Write(new FigletText("ConsoleTT").Color(Color.Green));
+         ShowBasicInfo(console, settingsProvider);
       }
       else
       {
-         var rule = new Rule("[green]ConsoleTT[/]")
+         var rule = new Rule($"[green]ConsoleTT    ({settingsProvider.DbFile.FullName})[/]")
             .LeftAligned()
             .RuleStyle("green");
 

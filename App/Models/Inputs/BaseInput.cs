@@ -2,5 +2,5 @@
 
 public class BaseInput
 {
-   public bool InteractiveMode { get; set; }
+   public bool ManualMode { get; set; }
 }

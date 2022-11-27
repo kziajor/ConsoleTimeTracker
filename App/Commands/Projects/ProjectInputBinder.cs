@@ -9,14 +9,14 @@ public class ProjectInputBinder : BinderBase<ProjectInput>
    private readonly Argument<int>? _id;
    private readonly Option<string?>? _name;
    private readonly Option<bool?>? _closed;
-   private readonly Option<bool>? _interactiveMode;
+   private readonly Option<bool>? _manualMode;
 
-   public ProjectInputBinder(Argument<int>? id = null, Option<string?>? name = null, Option<bool?>? closed = null, Option<bool>? interactiveMode = null)
+   public ProjectInputBinder(Argument<int>? id = null, Option<string?>? name = null, Option<bool?>? closed = null, Option<bool>? manualMode = null)
    {
       _id = id;
       _name = name;
       _closed = closed;
-      _interactiveMode = interactiveMode;
+      _manualMode = manualMode;
    }
 
    protected override ProjectInput GetBoundValue(BindingContext bindingContext)
@@ -26,7 +26,7 @@ public class ProjectInputBinder : BinderBase<ProjectInput>
          Id = _id is not null ? bindingContext.ParseResult.GetValueForArgument(_id) : 0,
          Name = _name is not null ? bindingContext.ParseResult.GetValueForOption(_name) : string.Empty,
          Closed = _closed is not null ? bindingContext.ParseResult.GetValueForOption(_closed) : false,
-         InteractiveMode = _interactiveMode is not null && bindingContext.ParseResult.GetValueForOption(_interactiveMode),
+         ManualMode = _manualMode is not null && bindingContext.ParseResult.GetValueForOption(_manualMode),
       };
    }
 }

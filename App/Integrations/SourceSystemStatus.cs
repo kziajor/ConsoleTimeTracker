@@ -1,6 +1,6 @@
 ﻿namespace App.Integrations;
 
-public enum ExternalSystemStatusEnum
+public enum SourceSystemStatus
 {
    Open,
    Closed,

@@ -2,11 +2,8 @@
 using App.Extensions;
 using App.Models.Dtos;
 using App.Repositories;
-
 using Spectre.Console;
-
 using System.CommandLine;
-
 using Task = App.Entities.Task;
 
 namespace App.Commands.Tasks;
@@ -19,21 +16,21 @@ public class TaskDetailsCommand : Command
    public TaskDetailsCommand() : base("details", "Show task details")
    {
       var idArgument = TaskArguments.GetIdArgument();
-      var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
+      var manualModeOption = CommonOptions.GetManualModeOption();
 
       Add(idArgument);
-      Add(interactiveModeOption);
+      Add(manualModeOption);
 
-      this.SetHandler((taskId, interactiveMode) => ShowTaskHandler(_dbRepository, _console, taskId, interactiveMode), idArgument, interactiveModeOption);
+      this.SetHandler((taskId, manualMode) => ShowTaskHandler(_dbRepository, _console, taskId, manualMode), idArgument, manualModeOption);
    }
 
-   internal static void ShowTaskHandler(IDbRepository dbRepository, IAnsiConsole console, string? taskId, bool interactiveMode)
+   internal static void ShowTaskHandler(IDbRepository dbRepository, IAnsiConsole console, string? taskId, bool manualMode)
    {
       var universalTaskId = UniversalTaskId.Create(taskId);
 
-      Task? task = interactiveMode
-         ? TaskCommon.GetOrChoose(universalTaskId)
-         : dbRepository.Tasks.Get(universalTaskId);
+      Task? task = manualMode
+         ? dbRepository.Tasks.Get(universalTaskId)
+         : TaskCommon.GetOrChoose(universalTaskId);
 
       if (task is null)
       {

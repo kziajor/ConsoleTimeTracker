@@ -1,4 +1,5 @@
-﻿using App.Extensions;
+﻿using App.Assets;
+using App.Extensions;
 using Spectre.Console;
 
 namespace App.Commands;
@@ -12,9 +13,9 @@ public static class CommandCommon
       return AnsiConsole.Prompt(prompt);
    }
 
-   public static T? AskForWithEmptyAllowed<T>(string promptText, T? defaultValue = default)
+   public static T AskForWithEmptyAllowed<T>(string promptText, T defaultValue)
    {
-      var prompt = new TextPrompt<T?>(promptText)
+      var prompt = new TextPrompt<T>(promptText)
                   .PromptStyle("green")
                   .AllowEmpty()
                   .DefaultValue(defaultValue)
@@ -32,21 +33,21 @@ public static class CommandCommon
       return AnsiConsole.Prompt(prompt);
    }
 
-   public static T ChooseOne<T>(this IEnumerable<T> choices, string promptText, int? pageSize = null, Func<T, string>? optionNameConverter = null) where T : class
+   public static T ChooseOne<T>(this IEnumerable<T> choices, string promptText, int pageSize = 20, Func<T, bool>? predicateDefaultOption = null, Func<T, string>? optionNameConverter = null) where T : notnull
    {
       var selectionPrompt = new SelectionPrompt<T>()
          .Title(promptText)
-         .AddChoices(choices);
-
-      if (optionNameConverter is not null)
+         .AddChoices(choices)
+         .PageSize(pageSize)
+      .UseConverter(o =>
       {
-         selectionPrompt.UseConverter(optionNameConverter);
-      }
+         string optionLabel = optionNameConverter?.Invoke(o) ?? o.ToString() ?? string.Empty;
+         string result = predicateDefaultOption?.Invoke(o) ?? false
+            ? $"[{Colors.Primary.ToMarkup()} underline]{optionLabel}[/]"
+            : optionLabel;
 
-      if (pageSize is not null)
-      {
-         selectionPrompt.PageSize(pageSize.Value);
-      }
+         return result;
+      });
 
       return AnsiConsole.Prompt(selectionPrompt);
    }

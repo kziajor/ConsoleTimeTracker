@@ -14,20 +14,20 @@ public class TaskInputBinder : BinderBase<TaskInput>
    private readonly Option<bool?>? _closed;
    private readonly Option<int?>? _projectId;
    private readonly Option<decimal?>? _plannedTime;
-   private readonly Option<ExternalSystemEnum?>? _externalSystemType;
-   private readonly Option<string?>? _externalSystemTaskId;
-   private readonly Option<bool>? _interactiveMode;
+   private readonly Option<SourceSystemType?>? _sourceType;
+   private readonly Option<string?>? _sourceTaskId;
+   private readonly Option<bool>? _manualMode;
 
-   public TaskInputBinder(Argument<string?>? id = null, Option<string?>? title = null, Option<bool?>? closed = null, Option<int?>? projectId = null, Option<decimal?>? plannedTime = null, Option<bool>? interactiveMode = null, Option<ExternalSystemEnum?>? externalSystemType = null, Option<string?>? externalSystemTaskId = null)
+   public TaskInputBinder(Argument<string?>? id = null, Option<string?>? title = null, Option<bool?>? closed = null, Option<int?>? projectId = null, Option<decimal?>? plannedTime = null, Option<bool>? manualMode = null, Option<SourceSystemType?>? sourceType = null, Option<string?>? sourceTaskId = null)
    {
       _id = id;
       _title = title;
       _closed = closed;
       _projectId = projectId;
       _plannedTime = plannedTime;
-      _interactiveMode = interactiveMode;
-      _externalSystemType = externalSystemType;
-      _externalSystemTaskId = externalSystemTaskId;
+      _manualMode = manualMode;
+      _sourceType = sourceType;
+      _sourceTaskId = sourceTaskId;
    }
 
    protected override TaskInput GetBoundValue(BindingContext bindingContext)
@@ -39,9 +39,9 @@ public class TaskInputBinder : BinderBase<TaskInput>
          Closed = bindingContext.ParseResult.GetValueForOptionOrDefault(_closed),
          ProjectId = bindingContext.ParseResult.GetValueForOptionOrDefault(_projectId),
          PlannedTime = bindingContext.ParseResult.GetValueForOptionOrDefault(_plannedTime),
-         ExternalSystemType = bindingContext.ParseResult.GetValueForOptionOrDefault(_externalSystemType),
-         ExternalSystemTaskId = bindingContext.ParseResult.GetValueForOptionOrDefault(_externalSystemTaskId),
-         InteractiveMode = bindingContext.ParseResult.GetValueForOptionOrDefault(_interactiveMode),
+         SourceType = bindingContext.ParseResult.GetValueForOptionOrDefault(_sourceType),
+         SourceTaskId = bindingContext.ParseResult.GetValueForOptionOrDefault(_sourceTaskId),
+         ManualMode = bindingContext.ParseResult.GetValueForOptionOrDefault(_manualMode),
       };
    }
 }

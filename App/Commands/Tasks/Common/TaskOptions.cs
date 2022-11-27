@@ -1,5 +1,4 @@
 ﻿using App.Integrations;
-
 using System.CommandLine;
 
 namespace App.Commands.Tasks.Common;
@@ -45,21 +44,21 @@ public static class TaskOptions
       );
    }
 
-   public static Option<ExternalSystemEnum?> GetExternalSystemTypeOption()
+   public static Option<SourceSystemType?> GetSourceTypeOption()
    {
       return new(
-         name: "--external-system",
+         name: "--source",
          getDefaultValue: () => null,
-         description: "External system"
+         description: "Source type (Internal, Azure, etc.)"
       );
    }
 
-   public static Option<string?> GetExternalSystemTaskIdOption()
+   public static Option<string?> GetSourceTaskIdOption()
    {
       return new(
-         name: "--external-id",
+         name: "--source-task-id",
          getDefaultValue: () => null,
-         description: "Task id in external system"
+         description: "Task id in source system"
       );
    }
 }

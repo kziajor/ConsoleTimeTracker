@@ -34,12 +34,9 @@ public class TaskCommand : Command
          return;
       }
 
-      var orderBy = _settingsProvider.ExternalSystemPriority
-         ? "TA_ExternalSystemType ASC, TA_ExternalSystemTaskId DESC"
-         : "TA_Id DESC";
       var tasks = closed ?? false
-         ? _dbRepository.Tasks.GetClosed(orderBy)
-         : _dbRepository.Tasks.GetActive(orderBy);
+         ? _dbRepository.Tasks.GetClosed()
+         : _dbRepository.Tasks.GetActive();
 
       TaskCommon.DisplayTasksList(tasks, closed ?? false ? "Closed tasks" : "Active tasks");
    }

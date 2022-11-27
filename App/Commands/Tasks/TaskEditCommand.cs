@@ -2,12 +2,10 @@
 using App.Extensions;
 using App.Models.Inputs;
 using App.Repositories;
-
 using Spectre.Console;
-
 using System.CommandLine;
-
 using Task = App.Entities.Task;
+
 
 namespace App.Commands.Tasks;
 
@@ -23,18 +21,18 @@ public class TaskEditCommand : Command
       var projectIdOption = TaskOptions.GetProjectIdOption();
       var plannedTimeOption = TaskOptions.GetPlannedTimeOption();
       var closedOption = TaskOptions.GetClosedOption();
-      var externalSystemTypeOption = TaskOptions.GetExternalSystemTypeOption();
-      var externalSystemTaskIdOption = TaskOptions.GetExternalSystemTaskIdOption();
-      var interactiveMode = CommonOptions.GetInteractiveModeOption();
+      var sourceTypeOption = TaskOptions.GetSourceTypeOption();
+      var sourceTaskIdOption = TaskOptions.GetSourceTaskIdOption();
+      var manualMode = CommonOptions.GetManualModeOption();
 
       Add(idArgument);
       Add(titleOption);
       Add(projectIdOption);
       Add(plannedTimeOption);
       Add(closedOption);
-      Add(externalSystemTypeOption);
-      Add(externalSystemTaskIdOption);
-      Add(interactiveMode);
+      Add(sourceTypeOption);
+      Add(sourceTaskIdOption);
+      Add(manualMode);
 
       this.SetHandler(
          (taskInput) => EditTaskHandler(taskInput),
@@ -44,18 +42,18 @@ public class TaskEditCommand : Command
             closed: closedOption,
             projectId: projectIdOption,
             plannedTime: plannedTimeOption,
-            interactiveMode: interactiveMode,
-            externalSystemType: externalSystemTypeOption,
-            externalSystemTaskId: externalSystemTaskIdOption
+            manualMode: manualMode,
+            sourceType: sourceTypeOption,
+            sourceTaskId: sourceTaskIdOption
          )
       );
    }
 
    private void EditTaskHandler(TaskInput input)
    {
-      Task? task = input.InteractiveMode
-         ? TaskCommon.GetOrChoose(input.UniversalTaskId)
-         : _dbRepository.Tasks.Get(input.UniversalTaskId);
+      Task? task = input.ManualMode
+         ? _dbRepository.Tasks.Get(input.UniversalTaskId)
+         : TaskCommon.GetOrChoose(input.UniversalTaskId);
 
       if (task is null)
       {
@@ -63,8 +61,8 @@ public class TaskEditCommand : Command
          return;
       }
 
-      if (input.InteractiveMode) { TaskCommon.UpdateTaskDataInteractive(task, input); }
-      else { TaskCommon.UpdateTaskData(task, input); }
+      if (input.ManualMode) { TaskCommon.UpdateTaskData(task, input); }
+      else { TaskCommon.UpdateTaskDataInteractive(task, input); }
 
       try
       {

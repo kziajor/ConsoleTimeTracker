@@ -1,62 +1,81 @@
-﻿using App.Extensions;
-using App.Integrations;
+﻿using App.Integrations;
+using Task = App.Entities.Task;
 
 namespace App.Models.Dtos;
 
-public class UniversalTaskId
+public sealed class UniversalTaskId
 {
-   public const string INTERNAL_TASK_ID_PREFIX = "internal";
+   private const char FULL_TASK_ID_SEPARATOR = '.';
 
-   public ExternalSystemEnum? ExternalSystemType { get; private set; }
-   public string? ExternalSystemTaskId { get; private set; }
-   public int? TaskId { get; private set; }
-   public bool IsInternal => TaskId is not null && ExternalSystemType is null;
-   public bool IsEmpty => ExternalSystemType is null && TaskId is null;
+   private static readonly ISettingsProvider _settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
 
-   public static UniversalTaskId? Create(ExternalSystemEnum? systemType, string? taskId)
+   private string _externalTaskId = string.Empty;
+   private int _internalTaskId = 0;
+
+   public SourceSystemType SourceSystemType { get; private set; }
+   public string SourceSystemTaskId
    {
-      if (systemType is null) { return null; }
-
-      return new UniversalTaskId
+      get { return IsInternal ? InternalTaskId.ToString() : _externalTaskId; }
+      set
       {
-         ExternalSystemType = systemType,
-         ExternalSystemTaskId = taskId,
-         TaskId = null,
+         if (IsInternal)
+         {
+            _externalTaskId = string.Empty;
+            _ = int.TryParse(value, out _internalTaskId);
+         }
+         else
+         {
+            _externalTaskId = value;
+            _internalTaskId = 0;
+         }
+      }
+   }
+   public int InternalTaskId => _internalTaskId;
+   public bool IsInternal => SourceSystemType == Integrations.SourceSystemType.Internal;
+   public bool IsEmpty => string.IsNullOrEmpty(_externalTaskId) && _internalTaskId <= 0;
+   public string FullId => $"{SourceSystemType}{FULL_TASK_ID_SEPARATOR}{SourceSystemTaskId}";
+
+   public static UniversalTaskId Create(string sourceTaskId, SourceSystemType? sourceType)
+   {
+      if (string.IsNullOrEmpty(sourceTaskId)) { return new UniversalTaskId(); }
+
+      return new UniversalTaskId()
+      {
+         SourceSystemType = sourceType ?? _settingsProvider.SourceSystemDefaultType,
+         SourceSystemTaskId = sourceTaskId,
       };
    }
-   public static UniversalTaskId? Create(string? taskId)
+
+   public static UniversalTaskId Create(string? sourceTaskId)
    {
-      if (string.IsNullOrEmpty(taskId)) { return null; }
+      if (string.IsNullOrEmpty(sourceTaskId)) { return new UniversalTaskId(); }
 
-      var settingsProvider = ServicesProvider.GetInstance<ISettingsProvider>();
-      var splitResult = taskId.Split('-', 2);
+      var splitResult = sourceTaskId.Split(FULL_TASK_ID_SEPARATOR, 2);
 
-      if (splitResult.Length == 2 && Enum.TryParse(typeof(ExternalSystemEnum), splitResult[0], true, out object? externalSystemType) && externalSystemType is not null)
+      if (splitResult.Length < 2)
       {
-         return Create((ExternalSystemEnum)externalSystemType, splitResult[1]);
+         return Create(sourceTaskId, null);
       }
 
-      if (splitResult.Length == 2 && splitResult[0].ToLower() == INTERNAL_TASK_ID_PREFIX && splitResult[1].IsInt())
-      {
-         return new UniversalTaskId
-         {
-            ExternalSystemTaskId = null,
-            ExternalSystemType = null,
-            TaskId = splitResult[1].ToInt(),
-         };
-      }
+      if (!Enum.TryParse(splitResult[0], true, out SourceSystemType sourceSystemType)) { return new UniversalTaskId(); }
 
-      return new UniversalTaskId
-      {
-         ExternalSystemType = settingsProvider.ExternalSystemDefaultType,
-         ExternalSystemTaskId = taskId,
-         TaskId = taskId.ToInt(),
-      };
+      return Create(
+         splitResult[1]
+,
+         sourceSystemType);
+   }
+
+   public static UniversalTaskId Create(Task? task)
+   {
+      return task is not null ?
+         Create(task.TA_SourceTaskId, task.TA_SourceType)
+         : new UniversalTaskId();
    }
 
    public override string ToString()
    {
-      if (IsInternal) { return TaskId?.ToString() ?? string.Empty; }
-      return $"{ExternalSystemType}-{ExternalSystemTaskId}";
+      if (IsEmpty) { return string.Empty; }
+      if (SourceSystemType == _settingsProvider.SourceSystemDefaultType) { return SourceSystemTaskId; }
+      return FullId;
    }
 }

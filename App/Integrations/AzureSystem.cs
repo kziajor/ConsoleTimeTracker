@@ -2,7 +2,7 @@
 
 namespace App.Integrations;
 
-public sealed class AzureSystem : IExternalSystem
+public sealed class AzureSystem : ISourceSystem
 {
    public ExternalSystemTaskData GetTaskData(string externalSystemTaskId)
    {

@@ -17,19 +17,19 @@ public class RecordDetailsCommand : Command
    public RecordDetailsCommand() : base("show", "Display record details")
    {
       var idArgument = RecordArguments.GetIdArgument();
-      var interactiveMode = CommonOptions.GetInteractiveModeOption();
+      var manualMode = CommonOptions.GetManualModeOption();
 
       Add(idArgument);
-      Add(interactiveMode);
+      Add(manualMode);
 
-      this.SetHandler((recordId, interactiveMode) => RecordDetailsHandler(recordId, interactiveMode), idArgument, interactiveMode);
+      this.SetHandler((recordId, manualMode) => RecordDetailsHandler(recordId, manualMode), idArgument, manualMode);
    }
 
-   private void RecordDetailsHandler(int recordId, bool interactiveMode)
+   private void RecordDetailsHandler(int recordId, bool manualMode)
    {
-      Record? record = interactiveMode
-         ? RecordCommon.GetOrChoose(recordId)
-         : _dbRepository.Records.Get(recordId);
+      Record? record = manualMode
+         ? _dbRepository.Records.Get(recordId)
+         : RecordCommon.GetOrChoose(recordId);
 
       if (record is null)
       {

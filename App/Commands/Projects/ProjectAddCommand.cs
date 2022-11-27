@@ -19,25 +19,25 @@ namespace App.Commands.Projects
       {
          var nameOption = ProjectOptions.GetNameOption();
          var closedOption = ProjectOptions.GetClosedOption();
-         var interactiveMode = CommonOptions.GetInteractiveModeOption();
+         var manualMode = CommonOptions.GetManualModeOption();
 
          Add(nameOption);
          Add(closedOption);
-         Add(interactiveMode);
+         Add(manualMode);
 
          this.SetHandler((projectInput) => AddProjectHandler(projectInput),
             new ProjectInputBinder(
                name: nameOption,
                closed: closedOption,
-               interactiveMode: interactiveMode));
+               manualMode: manualMode));
       }
 
       private void AddProjectHandler(ProjectInput input)
       {
          var project = new Project();
 
-         if (input.InteractiveMode) { Interactive(project, input.Name, input.Closed); }
-         else { Manual(project, input.Name, input.Closed); }
+         if (input.ManualMode) { Manual(project, input.Name, input.Closed); }
+         else { Interactive(project, input.Name, input.Closed); }
 
          try
          {

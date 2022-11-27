@@ -16,19 +16,19 @@ public class ProjectDetailsCommand : Command
    public ProjectDetailsCommand() : base("details", "Show project details")
    {
       var idArgument = ProjectArguments.GetIdArgument();
-      var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
+      var manualModeOption = CommonOptions.GetManualModeOption();
 
       Add(idArgument);
-      Add(interactiveModeOption);
+      Add(manualModeOption);
 
-      this.SetHandler((projectId, interactiveMode) => ShowProjectHandler(projectId, interactiveMode), idArgument, interactiveModeOption);
+      this.SetHandler((projectId, manualMode) => ShowProjectHandler(projectId, manualMode), idArgument, manualModeOption);
    }
 
-   private void ShowProjectHandler(int projectId, bool interactiveMode)
+   private void ShowProjectHandler(int projectId, bool manualMode)
    {
-      Project? project = interactiveMode
-         ? ProjectCommon.GetOrChoose(projectId)
-         : _dbRepository.Projects.Get(projectId);
+      Project? project = manualMode
+         ? _dbRepository.Projects.Get(projectId)
+         : ProjectCommon.GetOrChoose(projectId);
 
       if (project is null)
       {

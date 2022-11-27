@@ -20,12 +20,12 @@ public class ProjectEditCommand : Command
       var idArgument = ProjectArguments.GetIdArgument();
       var nameOption = ProjectOptions.GetNameOption();
       var closedOption = ProjectOptions.GetClosedOption();
-      var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
+      var manualModeOption = CommonOptions.GetManualModeOption();
 
       Add(idArgument);
       Add(nameOption);
       Add(closedOption);
-      Add(interactiveModeOption);
+      Add(manualModeOption);
 
       this.SetHandler(
          (projectInput) => EditProjectHandler(projectInput),
@@ -33,20 +33,20 @@ public class ProjectEditCommand : Command
             idArgument,
             nameOption,
             closedOption,
-            interactiveModeOption));
+            manualModeOption));
    }
 
    private void EditProjectHandler(ProjectInput input)
    {
-      if (input.Id <= 0 && !input.InteractiveMode)
+      if (input.Id <= 0 && input.ManualMode)
       {
          _console.WriteError($"Project id {input.Id} is not valid");
          return;
       }
 
-      Project? project = input.InteractiveMode
-         ? ProjectCommon.GetOrChoose(input.Id)
-         : _dbRepository.Projects.Get(input.Id);
+      Project? project = input.ManualMode
+         ? _dbRepository.Projects.Get(input.Id)
+         : ProjectCommon.GetOrChoose(input.Id);
 
       if (project is null)
       {
@@ -56,8 +56,8 @@ public class ProjectEditCommand : Command
 
       try
       {
-         if (input.InteractiveMode) { Interactive(project, input.Name, input.Closed); }
-         else { ManualMode(project, input.Name, input.Closed); }
+         if (input.ManualMode) { ManualMode(project, input.Name, input.Closed); }
+         else { Interactive(project, input.Name, input.Closed); }
 
          ProjectCommon.ValidateModel(project);
       }

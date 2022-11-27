@@ -4,14 +4,14 @@ namespace App.Commands;
 
 public static class CommonOptions
 {
-   public static Option<bool> GetInteractiveModeOption()
+   public static Option<bool> GetManualModeOption()
    {
       var value = new Option<bool>(
-            name: "--interactive",
-            getDefaultValue: () => true,
-            description: "Use interactive mode to fill data"
+            name: "--manual",
+            getDefaultValue: () => false,
+            description: "Use manual mode to fill data. Only using command params."
          );
-      value.AddAlias("-i");
+      value.AddAlias("-m");
       return value;
    }
 }

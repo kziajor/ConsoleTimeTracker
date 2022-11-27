@@ -21,15 +21,15 @@ public sealed class RecordStartCommand : Command
    public RecordStartCommand() : base("start", "Start recording time in live")
    {
       var taskIdArgument = TaskArguments.GetIdArgument();
-      var interactiveMode = CommonOptions.GetInteractiveModeOption();
+      var manualMode = CommonOptions.GetManualModeOption();
 
       Add(taskIdArgument);
-      Add(interactiveMode);
+      Add(manualMode);
 
-      this.SetHandler((taskIdArgument, interactiveMode) => RecordStartHandler(taskIdArgument, interactiveMode), taskIdArgument, interactiveMode);
+      this.SetHandler((taskIdArgument, manualMode) => RecordStartHandler(taskIdArgument, manualMode), taskIdArgument, manualMode);
    }
 
-   internal void RecordStartHandler(string? taskIdArgument, bool interactiveMode)
+   internal void RecordStartHandler(string? taskIdArgument, bool manualMode)
    {
       var recordsInProgress = _dbRepository.Records.GetInProgress().ToList();
       var universalTaskId = UniversalTaskId.Create(taskIdArgument);
@@ -51,12 +51,13 @@ public sealed class RecordStartCommand : Command
       {
          var task = _dbRepository.Tasks.Get(universalTaskId);
 
-         if (interactiveMode && task is null)
+         if (!manualMode && task is null)
          {
             task ??= _dbRepository.Tasks
                   .GetActive()
-                  .OrderByDescending(t => t.TA_Id)
-                  .ChooseOne("Choose task", 20, (t) => t.GetOptionLabel());
+                  .OrderBy(t => t.TA_Project?.PR_Name)
+                  .OrderBy(t => t.TA_Title)
+                  .ChooseOne("Choose task", 20, optionNameConverter: (t) => t.GetOptionLabel());
          }
 
          if (task is null)
@@ -89,14 +90,10 @@ public sealed class RecordStartCommand : Command
       int lastMinutesSpent = -1;
       var plannedTime = record.Task?.TA_PlannedTime ?? 0;
       var spentTime = record.Task?.TA_SpentTime ?? 0;
-
-      var taskId = _settingsProvider.ExternalSystemPriority
-         ? $"{record.Task?.ExternalFullId} ({record.RE_RelTaskId})"
-         : $"{record.RE_RelTaskId} ({record.Task?.ExternalFullId})";
       var topGrid = new Grid().AddColumn().AddColumn()
-         .AddKeyValueRow("Task id", taskId)
+         .AddKeyValueRow("Task id", record.Task?.UniversalTaskId.ToString() ?? string.Empty)
          .AddKeyValueRow("Task title", record.Task?.TA_Title)
-         .AddKeyValueRow("Project name", record.Task?.Project?.PR_Name)
+         .AddKeyValueRow("Project name", record.Task?.TA_Project?.PR_Name)
          .AddKeyValueRow("Started at", record.RE_StartedAt.ToIsoString());
 
       while (continueCounting)
@@ -123,7 +120,7 @@ public sealed class RecordStartCommand : Command
 
             _console.Clear();
 
-            Program.DisplayTitle(_console, _settingsProvider);
+            Program.DisplayHeader(_console, _settingsProvider);
             _console.Write(topGrid);
             _console.Write(new Rule().RuleStyle("green"));
             _console.WriteLine();

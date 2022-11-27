@@ -20,17 +20,17 @@ namespace App.Commands.Tasks
          var projectIdOption = TaskOptions.GetProjectIdOption();
          var plannedTimeOption = TaskOptions.GetPlannedTimeOption();
          var closedOption = TaskOptions.GetClosedOption();
-         var externalSystemTypeOption = TaskOptions.GetExternalSystemTypeOption();
-         var externalSystemTaskIdOption = TaskOptions.GetExternalSystemTaskIdOption();
-         var interactiveMode = CommonOptions.GetInteractiveModeOption();
+         var sourceTypeOption = TaskOptions.GetSourceTypeOption();
+         var sourceTaskIdOption = TaskOptions.GetSourceTaskIdOption();
+         var manualMode = CommonOptions.GetManualModeOption();
 
          Add(titleOption);
          Add(projectIdOption);
          Add(plannedTimeOption);
          Add(closedOption);
-         Add(externalSystemTypeOption);
-         Add(externalSystemTaskIdOption);
-         Add(interactiveMode);
+         Add(sourceTypeOption);
+         Add(sourceTaskIdOption);
+         Add(manualMode);
 
          this.SetHandler(
             (taskInput) => AddTaskHandler(taskInput),
@@ -39,18 +39,18 @@ namespace App.Commands.Tasks
                closed: closedOption,
                projectId: projectIdOption,
                plannedTime: plannedTimeOption,
-               interactiveMode: interactiveMode,
-               externalSystemType: externalSystemTypeOption,
-               externalSystemTaskId: externalSystemTaskIdOption
+               manualMode: manualMode,
+               sourceType: sourceTypeOption,
+               sourceTaskId: sourceTaskIdOption
             )
          );
       }
 
       private void AddTaskHandler(TaskInput input)
       {
-         var task = input.InteractiveMode
-            ? TaskCommon.CreateTaskInteractive(input)
-            : TaskCommon.CreateTask(input);
+         var task = input.ManualMode
+            ? TaskCommon.CreateTask(input)
+            : TaskCommon.CreateTaskInteractive(input);
 
          try
          {

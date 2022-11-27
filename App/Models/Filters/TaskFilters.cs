@@ -8,6 +8,6 @@ public sealed class TaskFilters
    public int? ProjectId { get; set; } = null;
    public string? Title { get; set; } = null;
    public bool? Closed { get; set; } = null;
-   public string? ExternalSystemType { get; set; } = null;
-   public string? ExternalSystemTaskId { get; set; } = null;
+   public string? SourceSystemType { get; set; } = null;
+   public string? SourceSystemTaskId { get; set; } = null;
 }

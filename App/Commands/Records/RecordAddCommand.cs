@@ -21,13 +21,13 @@ public class RecordAddCommand : Command
       var startedAtOption = RecordOptions.GetStartedAtOption();
       var finishedAtOption = RecordOptions.GetFinishedAtOption();
       var commentOption = RecordOptions.GetCommentOption();
-      var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
+      var manualModeOption = CommonOptions.GetManualModeOption();
 
       Add(taskIdArgument);
       Add(startedAtOption);
       Add(finishedAtOption);
       Add(commentOption);
-      Add(interactiveModeOption);
+      Add(manualModeOption);
 
       this.SetHandler(
          (recordInput) => AddRecordHandler(recordInput),
@@ -36,7 +36,7 @@ public class RecordAddCommand : Command
             startedAt: startedAtOption,
             finishedAt: finishedAtOption,
             comment: commentOption,
-            interactiveMode: interactiveModeOption
+            manualMode: manualModeOption
          )
       );
    }
@@ -49,9 +49,9 @@ public class RecordAddCommand : Command
          RecordCommon.DisplayList(recordsInProgress, "Records in progres");
          _console.WriteLine();
 
-         var record = input.InteractiveMode
-            ? RecordCommon.CreateNewRecordInteractive(input)
-            : RecordCommon.CreateNewRecord(input);
+         var record = input.ManualMode
+            ? RecordCommon.CreateNewRecord(input)
+            : RecordCommon.CreateNewRecordInteractive(input);
 
          RecordCommon.ValidateModel(record);
 

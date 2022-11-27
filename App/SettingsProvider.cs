@@ -16,8 +16,7 @@ public interface ISettingsProvider
    string ConnectionString { get; }
    bool DisplayLargeAppName { get; }
    bool ClearConsoleAfterEveryCommand { get; }
-   bool ExternalSystemPriority { get; set; }
-   ExternalSystemEnum ExternalSystemDefaultType { get; set; }
+   SourceSystemType SourceSystemDefaultType { get; set; }
 }
 
 public sealed class SettingsProvider : ISettingsProvider
@@ -35,8 +34,7 @@ public sealed class SettingsProvider : ISettingsProvider
    public string ConnectionString { get; private set; } = string.Empty;
    public bool DisplayLargeAppName { get; private set; }
    public bool ClearConsoleAfterEveryCommand { get; private set; }
-   public bool ExternalSystemPriority { get; set; }
-   public ExternalSystemEnum ExternalSystemDefaultType { get; set; }
+   public SourceSystemType SourceSystemDefaultType { get; set; }
 
    #endregion
 
@@ -58,14 +56,13 @@ public sealed class SettingsProvider : ISettingsProvider
       ConnectionString = $"Data Source={DbFile}";
       DisplayLargeAppName = settingsDto?.DisplayLargeAppName ?? true;
       ClearConsoleAfterEveryCommand = settingsDto?.ClearConsoleAfterEveryCommand ?? false;
-      ExternalSystemPriority = settingsDto?.ExternalSystemPriority ?? false;
 
-      if (!Enum.TryParse(settingsDto?.ExternalSystemDefaultType, out ExternalSystemEnum externalSystemDefaultType))
+      if (!Enum.TryParse(settingsDto?.SourceSystemDefaultType, out SourceSystemType sourceSystemDefaultType))
       {
-         externalSystemDefaultType = ExternalSystemEnum.Azure;
+         sourceSystemDefaultType = SourceSystemType.Internal;
       }
 
-      ExternalSystemDefaultType = externalSystemDefaultType;
+      SourceSystemDefaultType = sourceSystemDefaultType;
    }
 
    private SettingsDto SettingsFileReadOrCreate()

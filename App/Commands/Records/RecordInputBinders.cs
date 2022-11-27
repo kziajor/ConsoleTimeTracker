@@ -15,9 +15,9 @@ public sealed class RecordInputBinder : BinderBase<RecordInput>
    private readonly Option<string?>? _comment;
    private readonly Option<bool>? _clearComment;
    private readonly Option<bool>? _clearFinishedAt;
-   private readonly Option<bool>? _interactiveMode;
+   private readonly Option<bool>? _manualMode;
 
-   public RecordInputBinder(Argument<int>? recordId = null, Argument<string?>? taskIdArgument = null, Option<string?>? taskIdOption = null, Option<DateTime?>? startedAt = null, Option<DateTime?>? finishedAt = null, Option<string?>? comment = null, Option<bool>? clearComment = null, Option<bool>? clearFinishedAt = null, Option<bool>? interactiveMode = null)
+   public RecordInputBinder(Argument<int>? recordId = null, Argument<string?>? taskIdArgument = null, Option<string?>? taskIdOption = null, Option<DateTime?>? startedAt = null, Option<DateTime?>? finishedAt = null, Option<string?>? comment = null, Option<bool>? clearComment = null, Option<bool>? clearFinishedAt = null, Option<bool>? manualMode = null)
    {
       _recordIdArgument = recordId;
       _taskIdArgument = taskIdArgument;
@@ -27,7 +27,7 @@ public sealed class RecordInputBinder : BinderBase<RecordInput>
       _comment = comment;
       _clearComment = clearComment;
       _clearFinishedAt = clearFinishedAt;
-      _interactiveMode = interactiveMode;
+      _manualMode = manualMode;
    }
 
    protected override RecordInput GetBoundValue(BindingContext bindingContext)
@@ -41,7 +41,7 @@ public sealed class RecordInputBinder : BinderBase<RecordInput>
          Comment = bindingContext.ParseResult.GetValueForOptionOrDefault(_comment),
          ClearComment = bindingContext.ParseResult.GetValueForOptionOrDefault(_clearComment),
          ClearFinishedAt = bindingContext.ParseResult.GetValueForOptionOrDefault(_clearFinishedAt),
-         InteractiveMode = bindingContext.ParseResult.GetValueForOptionOrDefault(_interactiveMode)
+         ManualMode = bindingContext.ParseResult.GetValueForOptionOrDefault(_manualMode)
       };
    }
 }

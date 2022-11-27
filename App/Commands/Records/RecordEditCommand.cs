@@ -23,7 +23,7 @@ public class RecordEditCommand : Command
       var commentOption = RecordOptions.GetCommentOption();
       var clearCommentOption = RecordOptions.GetClearCommentOption();
       var clearFinishedAtOption = RecordOptions.GetClearFinishedAtOption();
-      var interactiveModeOption = CommonOptions.GetInteractiveModeOption();
+      var manualModeOption = CommonOptions.GetManualModeOption();
 
       Add(idArgument);
       Add(taskIdOption);
@@ -32,7 +32,7 @@ public class RecordEditCommand : Command
       Add(commentOption);
       Add(clearCommentOption);
       Add(clearFinishedAtOption);
-      Add(interactiveModeOption);
+      Add(manualModeOption);
 
       this.SetHandler(
          (recordInput) => EditRecordHandler(recordInput),
@@ -42,14 +42,14 @@ public class RecordEditCommand : Command
             startedAt: startedAtOption,
             finishedAt: finishedAtOption,
             comment: commentOption,
-            interactiveMode: interactiveModeOption,
+            manualMode: manualModeOption,
             clearComment: clearCommentOption,
             clearFinishedAt: clearFinishedAtOption));
    }
 
    private void EditRecordHandler(RecordInput input)
    {
-      if (input.Id <= 0 && !input.InteractiveMode)
+      if (input.Id <= 0 && input.ManualMode)
       {
          _console.WriteError($"Record id {input.Id} is not valid");
          return;
@@ -62,9 +62,9 @@ public class RecordEditCommand : Command
          RecordCommon.DisplayList(recordsInProgress, "Records in progres");
          _console.WriteLine();
 
-         var record = input.InteractiveMode
-            ? RecordCommon.GetOrChoose(input.Id)
-            : _dbRepository.Records.Get(input.Id);
+         var record = input.ManualMode
+            ? _dbRepository.Records.Get(input.Id)
+            : RecordCommon.GetOrChoose(input.Id);
 
          if (record == null)
          {
@@ -72,8 +72,8 @@ public class RecordEditCommand : Command
             return;
          }
 
-         if (input.InteractiveMode) { RecordCommon.UpdateRecordDataInteractive(record, input); }
-         else { RecordCommon.UpdateRecordData(record, input); }
+         if (input.ManualMode) { RecordCommon.UpdateRecordData(record, input); }
+         else { RecordCommon.UpdateRecordDataInteractive(record, input); }
 
          if (record.RE_FinishedAt is null && recordsInProgress.Any(r => r.RE_Id != record.RE_Id))
          {
