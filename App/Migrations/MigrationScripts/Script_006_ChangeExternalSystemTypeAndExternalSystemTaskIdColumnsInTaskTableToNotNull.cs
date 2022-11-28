@@ -1,4 +1,5 @@
 ﻿using DbUp.Engine;
+
 using System.Data;
 
 namespace App.Migrations.MigrationScripts;
@@ -35,23 +36,23 @@ public sealed class Script_006_ChangeExternalSystemTypeAndExternalSystemTaskIdCo
 
       INSERT INTO Tasks
       SELECT
-        TA_Id,
-        TA_Title,
-        TA_PlannedTime,
-        TA_Closed,
-        TA_RelProjectId,
+         TA_Id,
+         TA_Title,
+         TA_PlannedTime,
+         TA_Closed,
+         TA_RelProjectId,
          CASE TA_ExternalSystemType
-	      WHEN 0 THEN TA_ExternalSystemTaskId
-	      ELSE CAST(TA_Id AS TEXT)
-       END TA_ExternalSystemTaskId,
-        CASE TA_ExternalSystemType
-	        WHEN 0 THEN 1
-	        ELSE 0
-        END TA_ExternalSystemType	      
-      FROM Tasks;
+            WHEN 0 THEN 1
+            ELSE 0
+         END TA_ExternalSystemType,
+         CASE TA_ExternalSystemType
+            WHEN 0 THEN TA_ExternalSystemTaskId
+            ELSE ''
+         END TA_ExternalSystemTaskId
+      FROM Tasks_AlterSchemaTempTable;
 
       INSERT INTO Records
-      SELECT * FROM Records;
+      SELECT * FROM Records_AlterSchemaTempTable;
 
       DROP TABLE Records_AlterSchemaTempTable;
       DROP TABLE Tasks_AlterSchemaTempTable;
