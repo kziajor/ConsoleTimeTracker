@@ -85,6 +85,7 @@ public sealed class RecordCountCommand : Command
 
    private void DisplayTimer(Record record)
    {
+      var font = FigletFont.Load("./Assets/Fonts/Standard.flf");
       var continueCounting = true;
       var finishRecordAfterStop = false;
       int lastMinutesSpent = -1;
@@ -114,7 +115,7 @@ public sealed class RecordCountCommand : Command
             var totalSpentTime = spentTime + currentMinutesSpent;
             var leftTime = plannedTime - totalSpentTime;
             var overtime = leftTime < 0 ? leftTime * (-1) : 0;
-            var counterText = new FigletText($"{totalSpentTime.MinutesToHours():0.00} h")
+            var counterText = new FigletText(font, $"{totalSpentTime.MinutesToHours():0.00} h - {(float)totalSpentTime / plannedTime:0%}")
                .Centered()
                .Color(overtime == 0 ? Color.Green : Color.Red);
 

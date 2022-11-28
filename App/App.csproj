@@ -26,4 +26,22 @@
       <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.2" />
    </ItemGroup>
 
+   <ItemGroup>
+     <None Update="Assets\Fonts\ANSI_Shadow.flf">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="Assets\Fonts\ANSI_Regular.flf">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="Assets\Fonts\Ogre.flf">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="Assets\Fonts\Standard.flf">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="Assets\Fonts\Star_Wars.flf">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+   </ItemGroup>
+
 </Project>
