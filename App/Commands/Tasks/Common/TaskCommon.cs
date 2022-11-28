@@ -209,7 +209,9 @@ namespace App.Commands.Tasks.Common
          task.TA_Closed = input.Closed ?? task.TA_Closed;
          task.TimePlannedHours = input.PlannedTime ?? task.TimePlannedHours;
          task.TA_SourceType = input.SourceType ?? task.TA_SourceType;
-         task.TA_SourceTaskId = string.IsNullOrEmpty(input.SourceTaskId) ? string.Empty : input.SourceTaskId;
+         task.TA_SourceTaskId = task.TA_SourceType != SourceSystemType.Internal
+            ? string.IsNullOrEmpty(input.SourceTaskId) ? task.TA_SourceTaskId : input.SourceTaskId
+            : string.Empty;
       }
 
       public static void ValidateModel(Task task)
