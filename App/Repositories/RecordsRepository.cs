@@ -95,7 +95,7 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
       return Query((connection) => connection.Query<Record, Task, Project, Record>(GetByIdQuery, (record, task, project) =>
       {
          task.TA_Project = project;
-         record.Task = task;
+         record.RE_Task = task;
 
          return record;
       },
@@ -115,7 +115,7 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
       return Query((connection) => connection.Query<Record, Task, Project, Record>(query, (record, task, project) =>
       {
          task.TA_Project = project;
-         record.Task = task;
+         record.RE_Task = task;
 
          return record;
       },
@@ -137,7 +137,7 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
       return Query(connection => connection.Query<Record, Task, Project, Record>(query, (record, task, project) =>
       {
          task.TA_Project = project;
-         record.Task = task;
+         record.RE_Task = task;
 
          return record;
       },
@@ -151,7 +151,7 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
       return Query((connection) => connection.Query<Record, Task, Project, Record>(query, (record, task, project) =>
       {
          task.TA_Project = project;
-         record.Task = task;
+         record.RE_Task = task;
 
          return record;
       }, splitOn: "TA_Id, PR_Id"));

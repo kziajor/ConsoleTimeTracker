@@ -27,7 +27,7 @@ namespace App.Commands.Projects
             ? _dbRepository.Projects.GetClosed()
             : _dbRepository.Projects.GetActive();
 
-         ProjectCommon.DisplayProjectsList(projects, closed ?? false ? "Closed projects" : "Active projects");
+         ProjectCommon.DisplayList(projects, closed ?? false ? "Closed projects" : "Active projects");
       }
    }
 }

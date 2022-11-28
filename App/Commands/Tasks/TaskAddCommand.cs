@@ -71,7 +71,7 @@ namespace App.Commands.Tasks
 
          _console.MarkupLine("[green]New task added[/]");
          _console.WriteLine();
-         TaskCommon.DisplayTasksList(_dbRepository.Tasks.GetActive(), "Active tasks");
+         TaskCommon.DisplayList(_dbRepository.Tasks.GetActive(), "Active tasks");
       }
    }
 }

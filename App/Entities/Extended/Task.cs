@@ -13,6 +13,6 @@ public partial class Task
          return _universalTaskId ??= UniversalTaskId.Create(taskId, TA_SourceType);
       }
    }
-   public decimal PlannedTimeInHours { get => Math.Round((decimal)TA_PlannedTime / 60, 2); set => TA_PlannedTime = (int)(value * 60); }
-   public decimal SpentTimeInHours => Math.Round((decimal)TA_SpentTime / 60, 2);
+   public decimal TimePlannedHours { get => Math.Round((decimal)TA_PlannedTime / 60, 2); set => TA_PlannedTime = (int)(value * 60); }
+   public decimal TimeSpentHours => Math.Round((decimal)TA_SpentTime / 60, 2);
 }

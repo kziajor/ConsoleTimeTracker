@@ -38,6 +38,6 @@ public class TaskCommand : Command
          ? _dbRepository.Tasks.GetClosed()
          : _dbRepository.Tasks.GetActive();
 
-      TaskCommon.DisplayTasksList(tasks, closed ?? false ? "Closed tasks" : "Active tasks");
+      TaskCommon.DisplayList(tasks, closed ?? false ? "Closed tasks" : "Active tasks");
    }
 }

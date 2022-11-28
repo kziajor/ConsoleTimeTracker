@@ -84,6 +84,6 @@ public class TaskEditCommand : Command
 
       _console.MarkupLine("[green]Task updated successfully[/]");
       _console.WriteLine();
-      TaskCommon.DisplayTasksList(_dbRepository.Tasks.GetActive(), "Active tasks");
+      TaskCommon.DisplayList(_dbRepository.Tasks.GetActive(), "Active tasks");
    }
 }

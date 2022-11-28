@@ -73,12 +73,12 @@ public sealed class RecordCountCommand : Command
          };
 
          recordToStart.RE_Id = _dbRepository.Records.Insert(recordToStart)?.RE_Id;
-         recordToStart.Task = task;
+         recordToStart.RE_Task = task;
       }
 
       if (recordToStart.RE_Id <= 0) { return; }
 
-      recordToStart.Task = _dbRepository.Tasks.Get(recordToStart.RE_RelTaskId);
+      recordToStart.RE_Task = _dbRepository.Tasks.Get(recordToStart.RE_RelTaskId);
 
       DisplayTimer(recordToStart);
    }
@@ -88,12 +88,12 @@ public sealed class RecordCountCommand : Command
       var continueCounting = true;
       var finishRecordAfterStop = false;
       int lastMinutesSpent = -1;
-      var plannedTime = record.Task?.TA_PlannedTime ?? 0;
-      var spentTime = record.Task?.TA_SpentTime ?? 0;
+      var plannedTime = record.RE_Task?.TA_PlannedTime ?? 0;
+      var spentTime = record.RE_Task?.TA_SpentTime ?? 0;
       var topGrid = new Grid().AddColumn().AddColumn()
-         .AddKeyValueRow("Task id", record.Task?.UniversalTaskId.ToString() ?? string.Empty)
-         .AddKeyValueRow("Task title", record.Task?.TA_Title)
-         .AddKeyValueRow("Project name", record.Task?.TA_Project?.PR_Name)
+         .AddKeyValueRow("Task id", record.RE_Task?.UniversalTaskId.ToString() ?? string.Empty)
+         .AddKeyValueRow("Task title", record.RE_Task?.TA_Title)
+         .AddKeyValueRow("Project name", record.RE_Task?.TA_Project?.PR_Name)
          .AddKeyValueRow("Started at", record.RE_StartedAt.ToIsoString());
 
       while (continueCounting)
@@ -211,7 +211,7 @@ public sealed class RecordCountCommand : Command
          _console.WriteLine();
          _console.Write(new Rule("Task details").RuleStyle("white").Centered());
          _console.WriteLine();
-         TaskCommon.ShowTaskDetails(_dbRepository.Tasks.Get(record.RE_RelTaskId));
+         TaskCommon.ShowDetails(_dbRepository.Tasks.Get(record.RE_RelTaskId));
       }
       else
       {

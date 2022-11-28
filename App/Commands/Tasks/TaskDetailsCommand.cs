@@ -38,6 +38,6 @@ public class TaskDetailsCommand : Command
          return;
       }
 
-      TaskCommon.ShowTaskDetails(task);
+      TaskCommon.ShowDetails(task);
    }
 }

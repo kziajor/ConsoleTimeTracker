@@ -1,6 +1,6 @@
 ﻿using App.Entities;
-
 using Dapper;
+using Task = App.Entities.Task;
 
 namespace App.Repositories;
 
@@ -20,7 +20,17 @@ public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
 
    #region Queries
 
-   private static readonly string GetAllQuery = $"SELECT * FROM {Project.TableName}";
+   private static readonly string GetAllQuery =
+      $@"
+         SELECT
+            {Project.TableName}.*
+            ,SUM({nameof(Record.RE_MinutesSpent)}) AS '{nameof(Project.PR_TimeSpent)}'
+         FROM {Project.TableName}
+         LEFT JOIN {Task.TableName} ON {nameof(Task.TA_RelProjectId)} = {nameof(Project.PR_Id)}
+         LEFT JOIN {Record.TableName} ON {nameof(Record.RE_RelTaskId)} = {nameof(Task.TA_Id)}
+         {{0}}
+         GROUP BY {nameof(Project.PR_Id)}, {nameof(Project.PR_Name)}
+      ";
 
    private static readonly string InsertQuery =
       $@"
@@ -47,11 +57,11 @@ public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
             {nameof(Project.PR_Id)} = @{nameof(Project.PR_Id)}
       ";
 
-   private static readonly string GetByIdQuery = $"{GetAllQuery} WHERE {nameof(Project.PR_Id)} = @{nameof(Project.PR_Id)}";
+   private static readonly string GetByIdQuery = string.Format(GetAllQuery, $"WHERE {nameof(Project.PR_Id)} = @{nameof(Project.PR_Id)}");
 
-   private static readonly string GetClosedQuery = $"{GetAllQuery} WHERE {nameof(Project.PR_Closed)} >= 1";
+   private static readonly string GetClosedQuery = string.Format(GetAllQuery, $"WHERE {nameof(Project.PR_Closed)} >= 1");
 
-   private static readonly string GetActiveQuery = $"{GetAllQuery} WHERE {nameof(Project.PR_Closed)} <= 0";
+   private static readonly string GetActiveQuery = string.Format(GetAllQuery, $"WHERE {nameof(Project.PR_Closed)} <= 0");
 
    #endregion
 

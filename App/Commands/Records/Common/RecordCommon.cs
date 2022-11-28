@@ -34,9 +34,9 @@ namespace App.Commands.Records
          {
             table.AddRow(
                new Text(record.RE_Id?.ToString() ?? string.Empty),
-               new Text(record.Task?.UniversalTaskId.ToString() ?? string.Empty),
-               new Text(record.Task?.TA_Project?.PR_Name ?? string.Empty),
-               new Text(record.Task?.TA_Title ?? string.Empty),
+               new Text(record.RE_Task?.UniversalTaskId.ToString() ?? string.Empty),
+               new Text(record.RE_Task?.TA_Project?.PR_Name ?? string.Empty),
+               new Text(record.RE_Task?.TA_Title ?? string.Empty),
                new Text(record.RE_StartedAt.ToIsoString()),
                new Text(record.RE_FinishedAt?.ToIsoString() ?? string.Empty),
                new Text(record.TimeSpentHours > 0 ? record.TimeSpentHours.ToString("0.00") : "-").RightAligned(),
@@ -187,8 +187,8 @@ namespace App.Commands.Records
 
          grid
             .AddKeyValueRow("Id", record.RE_Id)
-            .AddKeyValueRow("Project", record.Task?.TA_Project?.PR_Name)
-            .AddKeyValueRow("Task", record.Task?.TA_Title)
+            .AddKeyValueRow("Project", record.RE_Task?.TA_Project?.PR_Name)
+            .AddKeyValueRow("Task", record.RE_Task?.TA_Title)
             .AddKeyValueRow("Started at", record.RE_StartedAt)
             .AddKeyValueRow("Finished at", record.RE_FinishedAt)
             .AddKeyValueRow("Time spent (m)", record.RE_MinutesSpent)

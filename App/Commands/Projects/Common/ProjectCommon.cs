@@ -1,4 +1,5 @@
-﻿using App.Entities;
+﻿using App.Assets;
+using App.Entities;
 using App.Extensions;
 using App.Repositories;
 
@@ -8,24 +9,47 @@ namespace App.Commands.Projects.Common
 {
    public static class ProjectCommon
    {
-      public static void DisplayProjectsList(IEnumerable<Project> projects, string header = "Projects")
+      private static readonly IAnsiConsole _console = ServicesProvider.GetInstance<IAnsiConsole>();
+
+      public static void DisplayList(IEnumerable<Project> projects, string header = "Projects")
       {
-         var console = ServicesProvider.GetInstance<IAnsiConsole>();
-         var table = new Table
-         {
-            Border = TableBorder.Rounded
-         }
-            .AddColumn(new TableColumn("[green]Id[/]").LeftAligned())
-            .AddColumn(new TableColumn("[green]Name[/]").LeftAligned())
-            .AddColumn(new TableColumn("[green]Active[/]").Centered());
+         var table = new Table { Border = TableBorder.Rounded }
+            .AddColumn(new TableColumn($"[{Colors.Primary}]Id[/]").LeftAligned())
+            .AddColumn(new TableColumn($"[{Colors.Primary}]Name[/]").LeftAligned())
+            .AddColumn(new TableColumn($"[{Colors.Primary}]Active[/]").Centered());
 
          foreach (var project in projects)
          {
             table.AddRow(project.PR_Id.ToString(), project.PR_Name, project.PR_Closed ? "" : "[green]X[/]");
          }
 
-         console.MarkupLineInterpolated($"[green]{header}[/]");
-         console.Write(table);
+         _console.MarkupLineInterpolated($"[green]{header}[/]");
+         _console.Write(table);
+      }
+
+      public static void DisplaySummary(IEnumerable<Project> projects, int totalTime, string header = "Projects summary")
+      {
+         var table = new Table { Border = TableBorder.Rounded }
+            .AddColumn(new TableColumn($"[{Colors.Primary}]Id[/]").LeftAligned())
+            .AddColumn(new TableColumn($"[{Colors.Primary}]Name[/]").LeftAligned())
+            .AddColumn(new TableColumn($"[{Colors.Primary}]Time spent[/]").RightAligned())
+            .AddColumn(new TableColumn($"[{Colors.Primary}]Percentage[/]").RightAligned());
+
+         foreach (var project in projects)
+         {
+            double percentage = (double)project.PR_TimeSpent / totalTime;
+
+            table.AddRow(
+               new Text(project.PR_Id.ToString()),
+               new Text(project.PR_Name),
+               new Text(project.TimeSpentHours > 0 ? project.TimeSpentHours.ToString("0.00") : "-").RightAligned(),
+               new Text(percentage > 0 ? percentage.ToString("0%") : "0%").RightAligned()
+            );
+         }
+
+         _console.MarkupLineInterpolated($"[green]{header}[/]");
+         _console.Write(table);
+         _console.MarkupLineInterpolated($"Total time spent: [{Colors.Primary} bold]{totalTime.MinutesToHours():0.00} h[/]");
       }
 
       public static void ShowProjectDetails(Project project)
