@@ -85,7 +85,7 @@ public sealed class RecordCountCommand : Command
 
    private void DisplayTimer(Record record)
    {
-      var font = FigletFont.Load("./Assets/Fonts/Standard.flf");
+      var font = FigletFont.Load(Path.Combine(AppContext.BaseDirectory, "./Assets/Fonts/Standard.flf"));
       var continueCounting = true;
       var finishRecordAfterStop = false;
       int lastMinutesSpent = -1;
