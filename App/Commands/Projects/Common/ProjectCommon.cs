@@ -43,7 +43,7 @@ namespace App.Commands.Projects.Common
                new Text(project.PR_Id.ToString()),
                new Text(project.PR_Name),
                new Text(project.TimeSpentHours > 0 ? project.TimeSpentHours.ToString("0.00") : "-").RightAligned(),
-               new Text(percentage > 0 ? percentage.ToString("0%") : "0%").RightAligned()
+               new Text(percentage > 0 ? percentage.ToString("0.00%") : "0.00%").RightAligned()
             );
          }
 

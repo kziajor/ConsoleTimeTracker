@@ -25,7 +25,7 @@ public static class CommandCommon
                   {
                      return choice switch
                      {
-                        DateTime c => c.ToIsoString(),
+                        DateTime c => c.ToIsoDateTime(),
                         _ => choice?.ToString() ?? string.Empty,
                      };
                   });
