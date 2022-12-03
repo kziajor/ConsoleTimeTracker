@@ -95,7 +95,7 @@ public sealed class RecordCountCommand : Command
          .AddKeyValueRow("Task id", record.RE_Task?.UniversalTaskId.ToString() ?? string.Empty)
          .AddKeyValueRow("Task title", record.RE_Task?.TA_Title)
          .AddKeyValueRow("Project name", record.RE_Task?.TA_Project?.PR_Name)
-         .AddKeyValueRow("Started at", record.RE_StartedAt.ToIsoString());
+         .AddKeyValueRow("Started at", record.RE_StartedAt.ToIsoDateTime());
 
       while (continueCounting)
       {

@@ -124,8 +124,8 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
 
    public IEnumerable<Record> GetByDay(DateTime day, string? orderBy = null)
    {
-      var dayBeginning = day.Date.ToIsoString();
-      var nextDayBeginning = day.Date.AddDays(1).ToIsoString();
+      var dayBeginning = day.Date.ToIsoDateTime();
+      var nextDayBeginning = day.Date.AddDays(1).ToIsoDateTime();
       var query =
          $@"
             {GetAllQuery}

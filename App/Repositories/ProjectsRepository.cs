@@ -12,6 +12,7 @@ public interface IProjectsRepository
    IEnumerable<Project> GetAll(string? orderBy = null);
    IEnumerable<Project> GetClosed(string? orderBy = null);
    IEnumerable<Project> GetActive(string? orderBy = null);
+   IEnumerable<Project> GetSummaryInPeriod(DateTime from, DateTime to, string? orderBy = null);
 }
 
 public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
@@ -63,6 +64,8 @@ public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
 
    private static readonly string GetActiveQuery = string.Format(GetAllQuery, $"WHERE {nameof(Project.PR_Closed)} <= 0");
 
+   private static readonly string GetSummaryInPeriodQuery = string.Format(GetAllQuery, $"WHERE {nameof(Record.RE_StartedAt)} >= @PeriodStart AND {nameof(Record.RE_StartedAt)} <= @PeriodEnd");
+
    #endregion
 
    public ProjectsRepository(string connectionString) : base(connectionString) { }
@@ -101,5 +104,14 @@ public sealed class ProjectsRepository : BaseRepository, IProjectsRepository
    public IEnumerable<Project> GetActive(string? orderBy = null)
    {
       return Query((connection) => connection.Query<Project>($"{GetActiveQuery} ORDER BY {orderBy ?? _defaultOrderBy}"));
+   }
+
+   public IEnumerable<Project> GetSummaryInPeriod(DateTime from, DateTime to, string? orderBy = null)
+   {
+      return Query(connection => connection.Query<Project>
+      (
+         $"{GetSummaryInPeriodQuery} ORDER BY {orderBy ?? _defaultOrderBy}",
+         new { PeriodStart = from, PeriodEnd = to })
+      );
    }
 }
