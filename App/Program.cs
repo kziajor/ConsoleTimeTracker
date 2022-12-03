@@ -1,5 +1,6 @@
 ﻿using App.Commands.Projects;
 using App.Commands.Records;
+using App.Commands.Reports;
 using App.Commands.Tasks;
 using App.Migrations;
 using App.Repositories;
@@ -58,6 +59,7 @@ static class Program
       rootCommand.Add(new ProjectCommand());
       rootCommand.Add(new TaskCommand());
       rootCommand.Add(new RecordCommand());
+      rootCommand.Add(new ReportCommand());
    }
 
    internal static void DisplayHeader(IAnsiConsole console, ISettingsProvider settingsProvider)
