@@ -2,14 +2,14 @@
 
 using System.Data;
 
-namespace App.Migrations.MigrationScripts;
+namespace DbMigrations.MigrationScripts;
 
 public sealed class Script_006_ChangeExternalSystemTypeAndExternalSystemTaskIdColumnsInTaskTableToNotNull : IScript
 {
-   private static string CheckExternalSystemTypeColumnIsNullable => "SELECT COUNT([notnull]) FROM pragma_table_info('Tasks') WHERE name = 'TA_ExternalSystemType' OR name = 'TA_ExternalSystemTaksId'";
+    private static string CheckExternalSystemTypeColumnIsNullable => "SELECT COUNT([notnull]) FROM pragma_table_info('Tasks') WHERE name = 'TA_ExternalSystemType' OR name = 'TA_ExternalSystemTaksId'";
 
-   private static string ChangeExternalSystemTypeColumnToNotNull =>
-      @"
+    private static string ChangeExternalSystemTypeColumnToNotNull =>
+       @"
       PRAGMA foreign_keys=off;
 
       ALTER TABLE Tasks RENAME TO Tasks_AlterSchemaTempTable;
@@ -60,14 +60,14 @@ public sealed class Script_006_ChangeExternalSystemTypeAndExternalSystemTaskIdCo
       PRAGMA foreign_keys=off;
       ";
 
-   public string ProvideScript(Func<IDbCommand> dbCommandFactory)
-   {
-      var command = dbCommandFactory();
+    public string ProvideScript(Func<IDbCommand> dbCommandFactory)
+    {
+        var command = dbCommandFactory();
 
-      command.CommandText = CheckExternalSystemTypeColumnIsNullable;
+        command.CommandText = CheckExternalSystemTypeColumnIsNullable;
 
-      if (Convert.ToInt64(command.ExecuteScalar()) > 1) { return string.Empty; }
+        if (Convert.ToInt64(command.ExecuteScalar()) > 1) { return string.Empty; }
 
-      return ChangeExternalSystemTypeColumnToNotNull;
-   }
+        return ChangeExternalSystemTypeColumnToNotNull;
+    }
 }

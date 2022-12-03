@@ -1,8 +1,32 @@
 {
   "profiles": {
-    "App": {
+    "task add": {
       "commandName": "Project",
-      "commandLineArgs": "--help"
+      "commandLineArgs": "task add"
+    },
+    "task edit": {
+      "commandName": "Project",
+      "commandLineArgs": "task edit 456 -cm"
+    },
+    "task": {
+      "commandName": "Project",
+      "commandLineArgs": "task"
+    },
+    "record add": {
+      "commandName": "Project",
+      "commandLineArgs": "record add"
+    },
+    "record": {
+      "commandName": "Project",
+      "commandLineArgs": "record -1"
+    },
+    "record count": {
+      "commandName": "Project",
+      "commandLineArgs": "report project lastmonth currentmonth"
+    },
+    "report project": {
+      "commandName": "Project",
+      "commandLineArgs": "report project lastmonth -2dm"
     }
   }
 }

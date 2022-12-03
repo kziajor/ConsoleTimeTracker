@@ -1,9 +1,8 @@
 ﻿using App.Commands.Projects;
 using App.Commands.Records;
 using App.Commands.Tasks;
-using App.Migrations;
 using App.Repositories;
-
+using DbMigrations;
 using Spectre.Console;
 
 using System.CommandLine;

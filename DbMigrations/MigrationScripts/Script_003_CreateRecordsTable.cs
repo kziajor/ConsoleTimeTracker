@@ -1,12 +1,12 @@
 ﻿using DbUp.Engine;
 using System.Data;
 
-namespace App.Migrations.MigrationScripts;
+namespace DbMigrations.MigrationScripts;
 
 public sealed class Script_003_CreateRecordsTable : IScript
 {
-   public string ProvideScript(Func<IDbCommand> dbCommandFactory) =>
-      @"
+    public string ProvideScript(Func<IDbCommand> dbCommandFactory) =>
+       @"
          CREATE TABLE IF NOT EXISTS Records (
             RE_Id INTEGER PRIMARY KEY AUTOINCREMENT,
             RE_StartedAt DATETIME NOT NULL,

@@ -1,7 +1,7 @@
 ﻿using DbUp;
 using DbUp.Engine;
 
-namespace App.Migrations;
+namespace DbMigrations;
 
 public static class DbMigrator
 {
