@@ -37,8 +37,8 @@ namespace App.Commands.Records
                new Text(record.RE_Task?.UniversalTaskId.ToString() ?? string.Empty),
                new Text(record.RE_Task?.TA_Project?.PR_Name ?? string.Empty),
                new Text(record.RE_Task?.TA_Title ?? string.Empty),
-               new Text(record.RE_StartedAt.ToIsoString()),
-               new Text(record.RE_FinishedAt?.ToIsoString() ?? string.Empty),
+               new Text(record.RE_StartedAt.ToIsoDateTime()),
+               new Text(record.RE_FinishedAt?.ToIsoDateTime() ?? string.Empty),
                new Text(record.TimeSpentHours > 0 ? record.TimeSpentHours.ToString("0.00") : "-").RightAligned(),
                new Text(record.RE_Comment ?? string.Empty)
             );
@@ -114,7 +114,7 @@ namespace App.Commands.Records
       public static void ValidateModel(Record record)
       {
          if (record.RE_RelTaskId == 0) throw new Exception("Task not found");
-         if (record.RE_FinishedAt is not null && record.RE_FinishedAt < record.RE_StartedAt) throw new ArgumentOutOfRangeException($"'Finished at' date is earlier than 'Started at' date ({record.RE_FinishedAt.Value.ToIsoString()} < {record.RE_StartedAt.ToIsoString()}");
+         if (record.RE_FinishedAt is not null && record.RE_FinishedAt < record.RE_StartedAt) throw new ArgumentOutOfRangeException($"'Finished at' date is earlier than 'Started at' date ({record.RE_FinishedAt.Value.ToIsoDateTime()} < {record.RE_StartedAt.ToIsoDateTime()}");
          if (record.RE_FinishedAt is not null && record.RE_StartedAt.Date != record.RE_FinishedAt?.Date) throw new ArgumentOutOfRangeException("'Finished at' date is in different day than 'Started at' date. Record must start and finished in the same day.");
          // TODO: Validate that record is not in conflict with another record (dates and times)
       }

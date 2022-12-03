@@ -31,7 +31,7 @@ public static class AnsiConsoleExtensions
       var valueString = value is not null
          ? value switch
          {
-            DateTime v => v.ToIsoString(),
+            DateTime v => v.ToIsoDateTime(),
             _ => value?.ToString() ?? string.Empty,
          }
          : string.Empty;
