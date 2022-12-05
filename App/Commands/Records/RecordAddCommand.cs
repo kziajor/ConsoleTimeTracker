@@ -66,16 +66,16 @@ public class RecordAddCommand : Command
          if (result is null)
          {
             _console.WriteErrorAndExit("Error while adding new record to database");
+            return;
          }
+
+         _console.MarkupLine("[green]New record added[/]");
+         _console.WriteLine();
+         RecordCommon.DisplayList(_dbRepository.Records.GetByDay(result.RE_StartedAt), "Records");
       }
       catch (Exception ex)
       {
          _console.WriteError(ex.Message);
-         return;
       }
-
-      _console.MarkupLine("[green]New record added[/]");
-      _console.WriteLine();
-      RecordCommon.DisplayList(_dbRepository.Records.GetAll(), "Records");
    }
 }
