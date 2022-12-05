@@ -20,7 +20,7 @@ namespace App.Commands.Projects.Common
 
          foreach (var project in projects)
          {
-            table.AddRow(project.PR_Id.ToString(), project.PR_Name, project.PR_Closed ? "" : "[green]X[/]");
+            table.AddRow(project.PR_Id.ToString(), project.PR_Name.EscapeMarkup(), project.PR_Closed ? "" : "[green]X[/]");
          }
 
          _console.MarkupLineInterpolated($"[green]{header}[/]");

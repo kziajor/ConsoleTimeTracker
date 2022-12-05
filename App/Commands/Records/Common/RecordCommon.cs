@@ -34,13 +34,13 @@ namespace App.Commands.Records
          {
             table.AddRow(
                new Text(record.RE_Id?.ToString() ?? string.Empty),
-               new Text(record.RE_Task?.UniversalTaskId.ToString() ?? string.Empty),
-               new Text(record.RE_Task?.TA_Project?.PR_Name ?? string.Empty),
-               new Text(record.RE_Task?.TA_Title ?? string.Empty),
+               new Text(record.RE_Task?.UniversalTaskId.ToString().EscapeMarkup() ?? string.Empty),
+               new Text(record.RE_Task?.TA_Project?.PR_Name.EscapeMarkup() ?? string.Empty),
+               new Text(record.RE_Task?.TA_Title.EscapeMarkup() ?? string.Empty),
                new Text(record.RE_StartedAt.ToIsoDateTime()),
                new Text(record.RE_FinishedAt?.ToIsoDateTime() ?? string.Empty),
                new Text(record.TimeSpentHours > 0 ? record.TimeSpentHours.ToString("0.00") : "-").RightAligned(),
-               new Text(record.RE_Comment ?? string.Empty)
+               new Text(record.RE_Comment.EscapeMarkup() ?? string.Empty)
             );
          }
 

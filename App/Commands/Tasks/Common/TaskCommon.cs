@@ -7,6 +7,7 @@ using App.Models.Inputs;
 using App.Repositories;
 
 using Spectre.Console;
+
 using Task = App.Entities.Task;
 
 namespace App.Commands.Tasks.Common
@@ -34,8 +35,8 @@ namespace App.Commands.Tasks.Common
          {
             table.AddRow(
                task.UniversalTaskId.ToString(),
-               task.TA_Project?.PR_Name ?? "",
-               task.TA_Title,
+               task.TA_Project?.PR_Name.EscapeMarkup() ?? "",
+               task.TA_Title.EscapeMarkup(),
                task.TimePlannedHours > 0 ? task.TimePlannedHours.ToString("0.00") : "-",
                task.TimeSpentHours > 0 ? task.TimeSpentHours.ToString("0.00") : "-",
                task.TA_Closed ? Icons.CHECK : Icons.CLOCK
