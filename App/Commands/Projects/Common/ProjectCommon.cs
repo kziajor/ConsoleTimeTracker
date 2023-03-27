@@ -74,7 +74,7 @@ namespace App.Commands.Projects.Common
          if (projectId is null || projectId <= 0)
          {
             return (projects ?? dbRepository.Projects.GetActive())
-               .ChooseOne("Choose project", 20, optionNameConverter: (project) => project.GetOptionLabel());
+               .ChooseOne("Choose project", 5, optionNameConverter: (project) => project.GetOptionLabel());
          }
 
          return dbRepository.Projects.Get(projectId.Value);

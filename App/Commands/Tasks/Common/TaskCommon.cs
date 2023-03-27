@@ -100,7 +100,7 @@ namespace App.Commands.Tasks.Common
       public static Task? Choose(IEnumerable<Task>? tasks = null)
       {
          return (tasks ?? _dbRepository.Tasks.GetActive())
-               .ChooseOne("Choose task", 20, optionNameConverter: (task) => task.GetOptionLabel() ?? task.TA_Title);
+               .ChooseOne("Choose task", 5, optionNameConverter: (task) => task.GetOptionLabel() ?? task.TA_Title);
       }
 
       public static Task? GetOrChoose(UniversalTaskId universalTaskId, IEnumerable<Task>? tasks = null)

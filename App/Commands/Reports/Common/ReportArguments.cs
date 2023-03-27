@@ -22,4 +22,14 @@ internal static class ReportArguments
          description: "Give report period end date (number - how many days from now, date - exact date. Special keywords available: lastmonth, currentmonth. If no value given then value of argument 'From' is used as value of argument 'To' also"
       );
    }
+
+   internal static Argument<int> MonthOffset
+   {
+      get => new
+      (
+          name: "month-offset",
+          getDefaultValue: () => 0,
+          description: "Month offset from now. For current month give 0 or no argument. For last month give -1. Etc."
+      );
+   }
 }

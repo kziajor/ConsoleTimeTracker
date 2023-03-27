@@ -1,7 +1,9 @@
 ﻿using App.Commands.Records.Common;
 using App.Entities;
 using App.Extensions;
+
 using Dapper;
+
 using Task = App.Entities.Task;
 
 namespace App.Repositories;
@@ -14,6 +16,7 @@ public interface IRecordsRepository
    IEnumerable<Record> GetAll(uint limit = 100, uint skip = 0, string? orderBy = null);
    IEnumerable<Record> GetInProgress(string? orderBy = null);
    IEnumerable<Record> GetByDay(DateTime day, string? orderBy = null);
+   IEnumerable<Record> GetByMonth(DateTime dayOfMonth, string? orderBy = null);
 }
 
 public sealed class RecordsRepository : BaseRepository, IRecordsRepository
@@ -155,5 +158,27 @@ public sealed class RecordsRepository : BaseRepository, IRecordsRepository
 
          return record;
       }, splitOn: "TA_Id, PR_Id"));
+   }
+
+   public IEnumerable<Record> GetByMonth(DateTime dayOfMonth, string? orderBy = null)
+   {
+      var monthBeginning = dayOfMonth.MonthBegin();
+      var monthEnd = dayOfMonth.MonthEnd();
+      var query =
+         $@"
+            {GetAllQuery}
+            WHERE
+               {nameof(Record.RE_StartedAt)} >= '{monthBeginning.ToIsoDate()}' AND {nameof(Record.RE_StartedAt)} <= '{monthEnd.ToIsoDate()}'
+            ORDER BY {orderBy ?? _defaultOrderBy}
+         ";
+
+      return Query(connection => connection.Query<Record, Task, Project, Record>(query, (record, task, project) =>
+      {
+         task.TA_Project = project;
+         record.RE_Task = task;
+
+         return record;
+      },
+      splitOn: "TA_Id, PR_Id"));
    }
 }

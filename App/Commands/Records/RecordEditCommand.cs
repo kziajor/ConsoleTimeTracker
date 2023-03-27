@@ -49,6 +49,7 @@ public class RecordEditCommand : Command
 
    private void EditRecordHandler(RecordInput input)
    {
+      DateTime updatedRecordDate;
       if (input.Id <= 0 && input.ManualMode)
       {
          _console.WriteError($"Record id {input.Id} is not valid");
@@ -88,6 +89,8 @@ public class RecordEditCommand : Command
             _console.WriteError("Error while updating record in database");
             return;
          }
+
+         updatedRecordDate = record.RE_StartedAt;
       }
       catch (Exception ex)
       {
@@ -97,6 +100,6 @@ public class RecordEditCommand : Command
 
       _console.MarkupLine("[green]Record updated successfully[/]");
       _console.WriteLine();
-      RecordCommon.DisplayList(_dbRepository.Records.GetAll(), "Records");
+      RecordCommon.DisplayList(_dbRepository.Records.GetByDay(updatedRecordDate), "Records");
    }
 }

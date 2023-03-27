@@ -15,7 +15,7 @@ namespace App.Commands.Records
       private static readonly IAnsiConsole _console = ServicesProvider.GetInstance<IAnsiConsole>();
       private static readonly IDbRepository _dbRepository = ServicesProvider.GetInstance<IDbRepository>();
 
-      public static void DisplayList(IEnumerable<Record> records, string header = "Records")
+      public static void DisplayList(IEnumerable<Record> records, string header = "Records", string footer = "")
       {
          var table = new Table();
 
@@ -46,6 +46,9 @@ namespace App.Commands.Records
 
          _console.MarkupLineInterpolated($"[green]{header}[/]");
          _console.Write(table);
+         _console.WriteLine();
+         _console.MarkupLine(footer);
+         _console.WriteLine();
       }
 
       public static void DisplayRecordsInProgress(IEnumerable<Record> records)
@@ -124,7 +127,7 @@ namespace App.Commands.Records
          if (recordId is null || recordId <= 0)
          {
             return (records ?? _dbRepository.Records.GetAll())
-               .ChooseOne("Choose record", 20, optionNameConverter: (record) => record.GetOptionLabel());
+               .ChooseOne("Choose record", 5, optionNameConverter: (record) => record.GetOptionLabel());
          }
 
          return _dbRepository.Records.Get(recordId.Value);

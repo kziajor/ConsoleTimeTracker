@@ -7,5 +7,6 @@ internal class ReportCommand : Command
    public ReportCommand() : base("report", "Reports")
    {
       Add(new ReportProjectSummaryCommand());
+      Add(new ReportMonthAverageTimePerDayCommand());
    }
 }
